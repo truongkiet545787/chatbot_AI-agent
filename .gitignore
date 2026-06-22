@@ -1,20 +1,29 @@
-# Python caches
-__pycache__/
+# Python
+backend/.venv/
+backend/__pycache__/
+backend/.env
 *.pyc
 
-# Environment variables (Bảo mật - Không bao giờ commit file này)
-.env
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.production.local
+frontend/.env.test.local
+frontend/.env
+frontend/dist/
 
-# Jupyter Notebooks (Bảo mật - Tránh lộ key chạy thử trong notebook)
-*.ipynb
-.ipynb_checkpoints/
-API/
-
-# Virtual environment
-venv/
-.venv/
-env/
-
-# IDE settings
+# IDEs
 .vscode/
 .idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Notebooks
+notebooks/
+

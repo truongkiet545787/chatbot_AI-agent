@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinal AI - Trợ Lý Thông Minh</title>
+    <!-- Nhúng font chữ Plus Jakarta Sans cao cấp -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+
+    <style>
+        /* Hiệu ứng nền Mesh Gradient huyền ảo */
+        .mesh-gradient {
+            background-color: #030712;
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 10%, rgba(168, 85, 247, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 80%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+            background-size: 100% 100%;
+            background-attachment: fixed;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.2);
+        }
+
+        /* Hiệu ứng gõ chữ của chatbot */
+        .typing-indicator span {
+            animation: blink 1.4s infinite both;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: .2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: .4s; }
+
+        @keyframes blink {
+            0% { opacity: .2; }
+            20% { opacity: 1; }
+            100% { opacity: .2; }
+        }
+
+        /* Glassmorphism panel */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Markdown lists and spacing */
+        .markdown-body ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .markdown-body ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .markdown-body li {
+            margin-bottom: 0.25rem;
+        }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+            font-weight: 700;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+        .markdown-body h1 { font-size: 1.4rem; }
+        .markdown-body h2 { font-size: 1.25rem; }
+        .markdown-body h3 { font-size: 1.1rem; }
+        .markdown-body p {
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+        .markdown-body blockquote {
+            border-left: 3px solid #6366f1;
+            padding-left: 1rem;
+            color: #94a3b8;
+            font-style: italic;
+            margin: 0.75rem 0;
+        }
+    </style>
+</head>
+<body class="mesh-gradient text-slate-200 h-screen w-screen overflow-hidden flex flex-row font-sans">
+
+    <!-- SIDEBAR (BÊN TRÁI) -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-slate-950/95 border-r border-slate-800/80 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+        <!-- Sidebar Header: Logo -->
+        <div class="h-16 px-6 border-b border-slate-900 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent">Kinal AI</span>
+            </div>
+            <!-- Nút đóng Sidebar trên Mobile -->
+            <button onclick="toggleSidebar()" class="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Sidebar Body: Action & History List -->
+        <div class="flex-1 p-4 flex flex-col gap-4 overflow-y-auto">
+            <!-- Nút Tạo Cuộc Trò Chuyện Mới -->
+            <button onclick="startNewChat()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-sm rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20 hover:scale-[0.99] active:scale-[0.98]">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Cuộc hội thoại mới</span>
+            </button>
+
+            <!-- Lịch sử Chat -->
+            <div class="flex-1 flex flex-col">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-2">Gần đây</span>
+                <div id="chatHistoryList" class="flex flex-col gap-1 overflow-y-auto max-h-[calc(100vh-270px)] pr-1">
+                    <!-- Các cuộc hội thoại cũ sẽ được render ở đây -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Footer: User Settings & Actions -->
+        <div class="p-4 border-t border-slate-900 bg-slate-950/40 flex flex-col gap-2">
+            <!-- Nút Clear History -->
+            <button onclick="clearAllChats()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-950/20 transition-all duration-200">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <span>Xóa toàn bộ lịch sử</span>
+            </button>
+            <div class="flex items-center gap-3 px-3 py-2">
+                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-semibold text-indigo-400 border border-slate-700/50">
+                    U
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <span class="text-xs font-semibold text-slate-200 truncate">Học Viên</span>
+                    <span class="text-[10px] text-slate-500 truncate">Bài tập Chatbot AI</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- SIDEBAR BACKDROP (MOBILE ONLY) -->
+    <div id="sidebarBackdrop" onclick="toggleSidebar()" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden md:hidden transition-opacity"></div>
+
+    <!-- MAIN CHAT CANVAS (BÊN PHẢI) -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        
+        <!-- Header -->
+        <header class="h-16 px-4 md:px-6 border-b border-slate-900/50 flex items-center justify-between z-10 glass-panel bg-slate-950/20">
+            <div class="flex items-center gap-3">
+                <!-- Nút Hamburger Menu trên Mobile -->
+                <button onclick="toggleSidebar()" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 transition-colors">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <div class="flex flex-col">
+                    <h1 id="currentChatTitle" class="text-sm font-semibold text-slate-100">Cuộc hội thoại mới</h1>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[10px] text-slate-400">Qwen/Llama - Trực tuyến</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="startNewChat()" title="Tạo chat mới" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900/60 transition-colors">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Message List Container -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto px-4 py-6 md:p-8 flex flex-col gap-6 scroll-smooth">
+            <!-- Tin nhắn hoặc Màn hình chào mừng sẽ hiện ở đây -->
+        </div>
+
+        <!-- Input Area Container -->
+        <div class="p-4 md:p-6 border-t border-slate-900/50 bg-slate-950/30 backdrop-blur-md">
+            <div class="max-w-3xl mx-auto flex flex-col gap-2">
+                <!-- Ô Nhập Liệu Thổi Hồn Cao Cấp -->
+                <div class="relative flex items-end w-full bg-slate-900/70 border border-slate-800 rounded-2xl focus-within:border-indigo-500/80 focus-within:ring-2 focus-within:ring-indigo-500/10 transition-all duration-300 p-2 shadow-2xl">
+                    <textarea 
+                        id="chatInput" 
+                        rows="1"
+                        placeholder="Hỏi Kinal AI bất cứ điều gì..."
+                        autocomplete="off"
+                        class="flex-1 bg-transparent border-0 outline-none focus:ring-0 text-slate-100 placeholder-slate-500 resize-none text-sm leading-relaxed max-h-48 py-2 px-3 no-scrollbar"
+                        style="height: 38px;"
+                    ></textarea>
+                    
+                    <button 
+                        id="sendBtn" 
+                        class="p-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all duration-200 flex items-center justify-center hover:scale-[1.03] active:scale-[0.98] disabled:opacity-40 disabled:hover:bg-indigo-600 disabled:scale-100"
+                        disabled
+                    >
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <div class="flex justify-between items-center px-2 text-[10px] text-slate-500">
+                    <span>Nhấn Enter để gửi, Shift+Enter để xuống dòng</span>
+                    <span>Bài làm Trợ Lý AI</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // DOM Elements
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const currentChatTitle = document.getElementById('currentChatTitle');
+        const chatHistoryList = document.getElementById('chatHistoryList');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+        // State
+        let currentChatId = null;
+        let chats = {}; // Lịch sử lưu dưới dạng: { chatId: { title: string, messages: [] } }
+
+        // Mẫu Prompt Gợi ý Nhanh
+        const suggestions = [
+            { title: "Viết email xin nghỉ phép", desc: "Tạo một email xin nghỉ ngắn hạn chuyên nghiệp gửi sếp.", text: "Hãy soạn giúp tôi một email gửi sếp xin nghỉ phép 2 ngày để giải quyết việc cá nhân, giọng văn trang trọng và chuyên nghiệp." },
+            { title: "Sửa lỗi code Python", desc: "Tìm và sửa lỗi lô-gích hoặc cú pháp trong đoạn code.", text: "Tôi đang gặp lỗi trong Python khi cố gắng đọc file JSON. Hãy chỉ tôi cách bắt lỗi ngoại lệ (exception handling) chuẩn nhất kèm code mẫu." },
+            { title: "Giải thích khái niệm", desc: "Tóm tắt các kiến thức phức tạp theo cách dễ hiểu nhất.", text: "Giải thích giúp tôi khái niệm Trí tuệ Nhân tạo Tạo sinh (Generative AI) cho một học sinh trung học dễ hiểu nhất." },
+            { title: "Lập dàn ý bài viết", desc: "Phác thảo cấu trúc bài viết chuẩn SEO hoặc báo cáo chuyên sâu.", text: "Lập dàn ý chi tiết cho bài viết blog chủ đề: 'Tầm quan trọng của việc học lập trình trong kỷ nguyên AI'." }
+        ];
+
+        // Khởi động
+        window.addEventListener('DOMContentLoaded', () => {
+            loadChatsFromStorage();
+            if (Object.keys(chats).length > 0) {
+                // Load chat gần nhất
+                const sortedChatIds = Object.keys(chats).sort((a, b) => b - a);
+                loadChat(sortedChatIds[0]);
+            } else {
+                startNewChat();
+            }
+            lucide.createIcons();
+            setupInputAutoresize();
+        });
+
+        // 1. Tự động điều chỉnh kích thước Textarea
+        function setupInputAutoresize() {
+            chatInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+                
+                if (this.value.trim()) {
+                    sendBtn.removeAttribute('disabled');
+                } else {
+                    sendBtn.setAttribute('disabled', 'true');
+                }
+            });
+
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                }
+            });
+        }
+
+        // 2. Quản lý Sidebar
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarBackdrop.classList.toggle('hidden');
+        }
+
+        // 3. Quản lý LocalStorage
+        function loadChatsFromStorage() {
+            const data = localStorage.getItem('kinal_ai_chats');
+            if (data) {
+                try {
+                    chats = JSON.parse(data);
+                } catch (e) {
+                    chats = {};
+                }
+            }
+            renderHistoryList();
+        }
+
+        // Tạo title cho chat dựa trên câu chat đầu tiên
+        function getChatTitle(messagesList) {
+            const userMsg = messagesList.find(m => m.role === 'user');
+            if (userMsg) {
+                const text = userMsg.content;
+                return text.length > 25 ? text.substring(0, 25) + '...' : text;
+            }
+            return 'Cuộc hội thoại mới';
+        }
+
+        function saveChatsToStorage() {
+            localStorage.setItem('kinal_ai_chats', JSON.stringify(chats));
+            renderHistoryList();
+        }
+
+        function renderHistoryList() {
+            chatHistoryList.innerHTML = '';
+            
+            const sortedIds = Object.keys(chats).sort((a, b) => b - a);
+            
+            if (sortedIds.length === 0) {
+                chatHistoryList.innerHTML = `
+                    <div class="text-xs text-slate-600 text-center py-4 italic">
+                        Không có cuộc trò chuyện nào
+                    </div>
+                `;
+                return;
+            }
+
+            sortedIds.forEach(id => {
+                const chat = chats[id];
+                const activeClass = id === currentChatId 
+                    ? 'bg-indigo-600/10 text-indigo-300 border-l-2 border-indigo-500 pl-2' 
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50';
+
+                const button = document.createElement('div');
+                button.className = `group flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ${activeClass}`;
+                button.setAttribute('data-chat-id', id);
+                
+                button.innerHTML = `
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1" onclick="loadChat('${id}')">
+                        <i data-lucide="message-square" class="w-4 h-4 shrink-0 opacity-70"></i>
+                        <span class="truncate block text-xs pr-2">${chat.title}</span>
+                    </div>
+                    <button onclick="deleteChat('${id}', event)" class="opacity-0 group-hover:opacity-100 hover:text-rose-400 p-1 transition-opacity">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                `;
+                chatHistoryList.appendChild(button);
+            });
+            lucide.createIcons();
+        }
+
+        // 4. Các chức năng chuyển đổi Hội thoại
+        function startNewChat() {
+            currentChatId = 'chat_' + Date.now();
+            chats[currentChatId] = {
+                title: 'Cuộc hội thoại mới',
+                messages: [
+                    { role: "system", content: "You are a helpful assistant. Please reply in Vietnamese." }
+                ]
+            };
+            
+            currentChatTitle.innerText = 'Cuộc hội thoại mới';
+            renderWelcomeScreen();
+            chatInput.value = '';
+            chatInput.style.height = '38px';
+            sendBtn.setAttribute('disabled', 'true');
+            
+            // Đóng sidebar trên mobile
+            sidebar.classList.add('-translate-x-full');
+            sidebarBackdrop.classList.add('hidden');
+
+            renderHistoryList();
+        }
+
+        function loadChat(id) {
+            if (!chats[id]) return;
+            currentChatId = id;
+            currentChatTitle.innerText = chats[id].title;
+
+            // Render lại toàn bộ tin nhắn
+            chatMessages.innerHTML = '';
+            const msgs = chats[id].messages;
+
+            // Kiểm tra xem có tin nhắn nào ngoài system chưa
+            const userMsgs = msgs.filter(m => m.role !== 'system');
+            if (userMsgs.length === 0) {
+                renderWelcomeScreen();
+            } else {
+                userMsgs.forEach(m => {
+                    appendMessageUI(m.role, m.content);
+                });
+            }
+
+            // Đóng sidebar trên mobile
+            sidebar.classList.add('-translate-x-full');
+            sidebarBackdrop.classList.add('hidden');
+
+            renderHistoryList();
+            scrollToBottom();
+        }
+
+        function deleteChat(id, event) {
+            if (event) event.stopPropagation();
+            delete chats[id];
+            saveChatsToStorage();
+            
+            if (currentChatId === id) {
+                const sortedIds = Object.keys(chats).sort((a, b) => b - a);
+                if (sortedIds.length > 0) {
+                    loadChat(sortedIds[0]);
+                } else {
+                    startNewChat();
+                }
+            }
+        }
+
+        function clearAllChats() {
+            if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử cuộc trò chuyện không?")) {
+                chats = {};
+                saveChatsToStorage();
+                startNewChat();
+            }
+        }
+
+        // 5. Màn hình chào mừng và gợi ý nhanh
+        function renderWelcomeScreen() {
+            chatMessages.innerHTML = `
+                <div class="max-w-2xl mx-auto flex-1 flex flex-col justify-center items-center py-12 md:py-20 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/20 mb-6 animate-bounce">
+                        <i data-lucide="sparkles" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-400 bg-clip-text text-transparent mb-3">
+                        Kinal AI Assistant
+                    </h2>
+                    <p class="text-sm text-slate-400 max-w-md mb-12">
+                        Một trợ lý ngôn ngữ mạnh mẽ được tích hợp trực tiếp giúp bạn viết lách, học tập, lập trình và giải đáp mọi thắc mắc ngay lập tức.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full text-left">
+                        ${suggestions.map((s, index) => `
+                            <div onclick="selectSuggestion(${index})" class="group p-4 bg-slate-900/40 hover:bg-indigo-950/20 border border-slate-800/80 hover:border-indigo-500/30 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-indigo-950/5 hover:-translate-y-[1px]">
+                                <h3 class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors flex items-center gap-1.5">
+                                    <span>${s.title}</span>
+                                    <i data-lucide="arrow-right" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5"></i>
+                                </h3>
+                                <p class="text-[11px] text-slate-500 mt-1 leading-normal">${s.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function selectSuggestion(index) {
+            const promptText = suggestions[index].text;
+            chatInput.value = promptText;
+            chatInput.style.height = 'auto';
+            chatInput.style.height = (chatInput.scrollHeight) + 'px';
+            sendBtn.removeAttribute('disabled');
+            handleSend();
+        }
+
+        // 6. Hiển thị tin nhắn và Bộ Parser Markdown & Code Block cao cấp
+        function escapeHtml(html) {
+            return html
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Bộ parser markdown đơn giản cực kỳ mạnh mẽ
+        function parseMarkdown(text) {
+            let html = escapeHtml(text);
+
+            // 1. Parse Code Blocks ```language ... ```
+            const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
+            html = html.replace(codeBlockRegex, (match, lang, code) => {
+                const cleanLang = lang.trim() || 'code';
+                const id = 'code_' + Math.floor(Math.random() * 1000000);
+                
+                return `
+                    <div class="my-4 rounded-xl border border-slate-800/80 bg-slate-950/80 overflow-hidden font-mono shadow-md">
+                        <div class="flex justify-between items-center px-4 py-2 bg-slate-900 border-b border-slate-800 text-[11px] text-slate-400">
+                            <span class="flex items-center gap-1.5 font-semibold text-slate-300">
+                                <i data-lucide="terminal" class="w-3.5 h-3.5 text-indigo-400"></i>
+                                ${cleanLang.toUpperCase()}
+                            </span>
+                            <button onclick="copyCodeText('${id}', this)" class="hover:text-white flex items-center gap-1 transition-colors">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                                <span>Copy</span>
+                            </button>
+                        </div>
+                        <pre class="p-4 overflow-x-auto text-xs text-slate-200 leading-relaxed"><code id="${id}">${code.trim()}</code></pre>
+                    </div>
+                `;
+            });
+
+            // 2. Parse Inline Code `code`
+            html = html.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-slate-900 text-pink-400 font-mono text-xs border border-slate-800">$1</code>');
+
+            // 3. Bold **text**
+            html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
+
+            // 4. Italic *text*
+            html = html.replace(/\*([^*]+)\*/g, '<em class="italic text-slate-300">$1</em>');
+
+            // 5. Blockquote > text
+            html = html.replace(/^\s*&gt;\s+(.+)$/gm, '<blockquote>$1</blockquote>');
+
+            // 6. Bullet lists
+            // Tách các dòng bắt đầu bằng dấu gạch ngang hoặc sao
+            html = html.replace(/^\s*[-*]\s+(.+)$/gm, '<li>$1</li>');
+            html = html.replace(/(<li>.*<\/li>)/s, '<ul class="my-2">$1</ul>');
+
+            // 7. Number lists
+            html = html.replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>');
+            html = html.replace(/(<li>.*<\/li>)/s, '<ol class="my-2">$1</ol>');
+
+            // 8. Headings
+            html = html.replace(/^\s*###\s+(.+)$/gm, '<h3>$1</h3>');
+            html = html.replace(/^\s*##\s+(.+)$/gm, '<h2>$1</h2>');
+            html = html.replace(/^\s*#\s+(.+)$/gm, '<h1>$1</h1>');
+
+            // 9. Đổi dấu xuống dòng thành thẻ <br>
+            // Tránh xuống dòng kép trong danh sách hoặc code block
+            html = html.replace(/\n/g, '<br>');
+            html = html.replace(/<\/li><br>/g, '</li>');
+            html = html.replace(/<\/ul><br>/g, '</ul>');
+            html = html.replace(/<\/ol><br>/g, '</ol>');
+            html = html.replace(/<\/blockquote><br>/g, '</blockquote>');
+            html = html.replace(/<\/div><br>/g, '</div>');
+
+            return html;
+        }
+
+        // Copy code helper
+        window.copyCodeText = function(id, buttonEl) {
+            const codeEl = document.getElementById(id);
+            if (!codeEl) return;
+            
+            // Lấy văn bản thô chưa unescaped (để copy chuẩn nhất)
+            // Vì chúng ta escapeHtml lúc đầu, ta cần convert ngược lại hoặc lấy innerText
+            const textToCopy = codeEl.innerText;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const span = buttonEl.querySelector('span');
+                
+                span.innerText = 'Copied!';
+                buttonEl.classList.add('text-emerald-400');
+                
+                setTimeout(() => {
+                    span.innerText = 'Copy';
+                    buttonEl.classList.remove('text-emerald-400');
+                }, 2000);
+            });
+        };
+
+        function appendMessageUI(role, content) {
+            // Xóa màn hình chào mừng nếu là tin nhắn đầu tiên
+            if (chatMessages.querySelector('.max-w-2xl')) {
+                chatMessages.innerHTML = '';
+            }
+
+            const isUser = role === 'user';
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = `flex w-full items-start gap-4 ${isUser ? 'justify-end' : 'justify-start'}`;
+
+            const parsedContent = isUser ? escapeHtml(content).replace(/\n/g, '<br>') : parseMarkdown(content);
+            
+            if (isUser) {
+                messageWrapper.innerHTML = `
+                    <div class="max-w-[85%] md:max-w-[75%] px-4 py-3 bg-gradient-to-tr from-indigo-600 to-indigo-700 text-white rounded-2xl rounded-tr-none shadow-lg shadow-indigo-900/10 text-sm leading-relaxed">
+                        ${parsedContent}
+                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700/50 shrink-0">
+                        <i data-lucide="user" class="w-4 h-4 text-indigo-400"></i>
+                    </div>
+                `;
+            } else {
+                messageWrapper.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shrink-0">
+                        <i data-lucide="bot" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <div class="max-w-[85%] md:max-w-[75%] px-4 py-3 bg-slate-900/50 border border-slate-800/80 rounded-2xl rounded-tl-none shadow-md text-sm text-slate-200 markdown-body">
+                        ${parsedContent}
+                    </div>
+                `;
+            }
+
+            chatMessages.appendChild(messageWrapper);
+            lucide.createIcons();
+            scrollToBottom();
+        }
+
+        // 7. Loading state
+        function showLoading() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'flex w-full items-start gap-4 justify-start';
+            loadingDiv.id = 'chatLoading';
+            loadingDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                    <i data-lucide="bot" class="w-4 h-4 text-white"></i>
+                </div>
+                <div class="px-5 py-4 bg-slate-900/50 border border-slate-800/80 rounded-2xl rounded-tl-none shadow-md text-sm text-slate-400 flex items-center gap-1.5 typing-indicator">
+                    <span>•</span><span>•</span><span>•</span>
+                </div>
+            `;
+            chatMessages.appendChild(loadingDiv);
+            lucide.createIcons();
+            scrollToBottom();
+        }
+
+        function removeLoading() {
+            const loadingDiv = document.getElementById('chatLoading');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 8. Xử lý Gửi tin nhắn
+        async function handleSend() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // Reset textarea
+            chatInput.value = '';
+            chatInput.style.height = '38px';
+            sendBtn.setAttribute('disabled', 'true');
+
+            // Cập nhật title hội thoại dựa trên câu hỏi đầu tiên
+            const currentChat = chats[currentChatId];
+            const isFirstUserMessage = currentChat.messages.filter(m => m.role !== 'system').length === 0;
+
+            // Append UI & Lưu State
+            appendMessageUI('user', text);
+            currentChat.messages.push({ role: "user", content: text });
+
+            if (isFirstUserMessage) {
+                currentChat.title = getChatTitle(currentChat.messages);
+                currentChatTitle.innerText = currentChat.title;
+            }
+            saveChatsToStorage();
+
+            showLoading();
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ messages: currentChat.messages })
+                });
+
+                const data = await response.json();
+                removeLoading();
+
+                if (response.ok && data.content) {
+                    appendMessageUI('bot', data.content);
+                    currentChat.messages.push({ role: "assistant", content: data.content });
+                    saveChatsToStorage();
+                } else {
+                    appendMessageUI('bot', `**Lỗi:** ${data.error || 'Đã xảy ra lỗi không xác định từ phía AI.'}`);
+                }
+            } catch (error) {
+                removeLoading();
+                appendMessageUI('bot', '**Lỗi kết nối:** Không thể gửi tin nhắn. Vui lòng kiểm tra xem Backend Flask đã chạy hay chưa.');
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

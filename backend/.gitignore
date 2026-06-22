@@ -1,0 +1,20 @@
+# Python caches
+__pycache__/
+*.pyc
+
+# Environment variables (Bảo mật - Không bao giờ commit file này)
+.env
+
+# Jupyter Notebooks (Bảo mật - Tránh lộ key chạy thử trong notebook)
+*.ipynb
+.ipynb_checkpoints/
+API/
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE settings
+.vscode/
+.idea/
