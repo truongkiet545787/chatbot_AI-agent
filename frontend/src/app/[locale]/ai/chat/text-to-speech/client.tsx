@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * TRANG VĂN BẢN THÀNH GIỌNG NÓI (TEXT-TO-SPEECH)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Tiếp nhận đầu vào là một chuỗi văn bản do người dùng nhập.
+ * - Chuyển đổi văn bản thành dữ liệu giọng đọc nhân tạo bằng giọng nói AI tự nhiên.
+ * - Trình phát âm thanh (WaveSurfer Player) cho phép phát lại tệp âm thanh kết quả.
+ * Trạng thái: ĐANG PHÁT TRIỂN - UPDATE SAU (Chưa hoàn thiện phần API xử lý Audio ở Backend)
+ */
+
 import React, { useRef, useState } from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useFormik } from 'formik';
@@ -12,9 +22,10 @@ import AIChatInputContainerCommon from '@/app/[locale]/ai/_common/AIChatInputCon
 import FieldWrap from '@/components/form/FieldWrap';
 import Input from '@/components/form/Input';
 import { ASSISTANT, CREATED, FAILED, PENDING, SUCCESSFUL, SYSTEM, USER } from '@/constant';
-import Subheader, { SubheaderRight } from '@/components/layouts/Subheader/Subheader';
+import Subheader, { SubheaderLeft, SubheaderRight } from '@/components/layouts/Subheader/Subheader';
 import { generateAudioApiCall } from '@/apiCalls/ai-demos/generateAudioApiCall';
 import WaveSurferPlayer from '@/components/WaveSurferPlayer';
+
 
 const ChatAudioClient = () => {
 	const [listQuestions, setListQuestions] = useState([
@@ -143,6 +154,14 @@ const ChatAudioClient = () => {
 	return (
 		<PageWrapper>
 			<Subheader>
+				<SubheaderLeft>
+					<span className='font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
+						Văn bản thành giọng nói
+						<span className='text-xs font-normal px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/25'>
+							Đang phát triển - Update sau
+						</span>
+					</span>
+				</SubheaderLeft>
 				<SubheaderRight>
 					<Button
 						variant='solid'

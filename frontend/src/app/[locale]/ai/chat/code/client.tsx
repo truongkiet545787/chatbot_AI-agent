@@ -1,5 +1,14 @@
 'use client';
 
+/**
+ * TRANG SINH MÃ NGUỒN (CODE GENERATION)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Tiếp nhận yêu cầu viết code từ người dùng và tự động tạo mã nguồn mẫu.
+ * Trạng thái: CHƯA HOÀN THIỆN - UPDATE SAU
+ */
+
+
 import React from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useFormik } from 'formik';

@@ -1,18 +1,16 @@
 # 🤖 Trợ Lý Chatbot AI Đa Năng (Next.js + Flask + OpenRouter)
 
-Dự án ứng dụng Trợ lý Chatbot AI toàn diện kết hợp giữa **Next.js** làm Frontend giao diện cao cấp (Premium UI/UX) và **Flask (Python)** làm Backend xử lý logic & kết nối với API **OpenRouter** để gọi các mô hình ngôn ngữ lớn miễn phí chất lượng cao (như Qwen, Llama).
+Dự án ứng dụng Trợ lý Chatbot AI toàn diện kết hợp giữa **Next.js** làm Frontend và **Flask (Python)** làm Backend để gọi các mô hình ngôn ngữ lớn từ **OpenRouter**.
 
 ---
 
-## ✨ Các Tính Năng Nổi Bật
+## ✨ Các Chức Năng Cốt Lõi
 
-* 💬 **Trợ lý Chatbot AI (AI Assistant):** Giao diện chat mượt mà phong cách kính mờ (glassmorphism), hỗ trợ tự động ngắt/khóa ô nhập khi AI đang phản hồi, nút gửi tự động chuyển đổi thành nút **Dừng phản hồi (Stop)** màu đỏ nhấp nháy.
-* 📂 **Chatbot RAG (RAG Document Chat):** Trò chuyện hỏi đáp thông minh dựa trên tài liệu tải lên.
-* 🎙️ **Nhận dạng giọng nói (Speech Recognition):** Chuyển giọng nói trực tiếp thành văn bản.
-* 🔊 **Văn bản thành giọng nói (Text-to-Speech):** Chuyển đổi văn bản viết thành giọng đọc.
-* 🎨 **Chỉnh sửa ảnh (Photo Editing):** Các tính năng nâng cao liên quan đến xử lý hình ảnh.
-* 🌓 **Chế độ tối (Dark Mode):** Giao diện tương thích hoàn hảo cả chế độ Sáng và Tối.
-* 🇻🇳 **Việt hóa 100%:** Giao diện điều hướng, nhãn, nút nhấn và nội dung hỗ trợ đã được chuyển ngữ hoàn toàn sang tiếng Việt.
+* 💬 **Trợ lý Chatbot AI (AI Assistant):** Trò chuyện hỏi đáp trực tiếp với AI có ghi nhớ ngữ cảnh cuộc trò chuyện.
+* 📂 **Chatbot RAG (RAG Document Chat):** Trò chuyện hỏi đáp thông minh dựa trên tài liệu tải lên (Đang phát triển - Update sau).
+* 🎙️ **Nhận dạng giọng nói (Speech Recognition):** Chuyển giọng nói trực tiếp thành văn bản (Đang phát triển - Update sau).
+* 🔊 **Văn bản thành giọng nói (Text-to-Speech):** Chuyển đổi văn bản viết thành giọng đọc (Đang phát triển - Update sau).
+* 🎨 **Chỉnh sửa ảnh (Photo Editing):** Các chức năng xử lý hình ảnh (Đang phát triển - Update sau).
 
 ---
 
@@ -31,7 +29,7 @@ chatbot_AI-agent/
 ├── frontend/             # Mã nguồn Frontend (Next.js App)
 │   ├── src/              # Các component React, Pages và Routing
 │   ├── package.json      # Danh sách thư viện Node.js cần thiết
-│   └── tailwind.config.ts# Cấu hình giao diện và giao thoa CSS
+│   └── tailwind.config.ts# Cấu hình giao diện và CSS
 │
 ├── .gitignore            # Cấu hình bỏ qua các tệp nhạy cảm (như .env, node_modules, notebooks/)
 └── README.md             # Hướng dẫn sử dụng dự án (Tệp tin này)
@@ -39,18 +37,15 @@ chatbot_AI-agent/
 
 ---
 
-## 🛠️ Hướng Dẫn Cài Đặt & Chạy Thử
+## 🛠️ Hướng Dẫn Cài Đặt & Khởi Chạy
 
-Yêu cầu môi trường: **Python 3.10+** và **Node.js 18+** đã cài đặt trên máy.
+Yêu cầu hệ thống: Máy tính đã cài đặt **Python 3.10+** và **Node.js 18+**.
 
 ### 1. Cài đặt & Khởi chạy Backend (Flask)
 
-Mở một cửa sổ dòng lệnh (Terminal/CMD) mới tại thư mục gốc của dự án:
+Mở cửa sổ dòng lệnh (Terminal/CMD) tại thư mục `backend/`:
 
 ```bash
-# Di chuyển vào thư mục backend
-cd backend
-
 # Tạo môi trường ảo Python
 python -m venv .venv
 
@@ -63,33 +58,28 @@ source .venv/bin/activate
 # Cài đặt các thư viện cần thiết
 pip install -r requirements.txt
 
-# Tạo tệp cấu hình môi trường (.env) từ tệp mẫu
+# Tạo tệp cấu hình .env từ tệp mẫu
 cp .env.example .env
 
-# Mở tệp .env vừa tạo và nhập OpenRouter API Key của bạn:
+# Mở tệp .env và điền OpenRouter API Key của bạn:
 # OPENAI_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxxx
 
 # Khởi chạy server Flask
 python run.py
 ```
-*Backend Flask sẽ chạy mặc định tại địa chỉ:* 👉 **`http://127.0.0.1:5000`**
+*Backend Flask chạy tại địa chỉ:* 👉 **`http://127.0.0.1:5000`**
 
 ---
 
 ### 2. Cài đặt & Khởi chạy Frontend (Next.js)
 
-Mở một cửa sổ dòng lệnh (Terminal/CMD) thứ hai tại thư mục gốc của dự án:
+Mở một cửa sổ dòng lệnh (Terminal/CMD) khác tại thư mục `frontend/`:
 
 ```bash
-# Di chuyển vào thư mục frontend
-cd frontend
-
 # Cài đặt các gói phụ thuộc (Dependencies)
 npm install
 
 # Khởi chạy server dev Next.js
 npm run dev
 ```
-*Frontend Next.js sẽ chạy mặc định tại địa chỉ:* 👉 **`http://localhost:3000`**
-
-Mở trình duyệt, truy cập vào `http://localhost:3000` để bắt đầu trải nghiệm toàn bộ hệ thống chatbot AI đa năng với giao diện tiếng Việt cao cấp mới.
+*Frontend Next.js chạy tại địa chỉ:* 👉 **`http://localhost:3000`**

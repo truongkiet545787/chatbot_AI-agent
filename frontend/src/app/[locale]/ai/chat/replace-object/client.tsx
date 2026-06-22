@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * TRANG THAY THẾ ĐỐI TƯỢNG (OBJECT REPLACEMENT)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Cho phép người dùng vẽ lên hình ảnh để khoanh vùng đối tượng muốn thay thế.
+ * - Mô tả đối tượng mới thông qua văn bản để hệ thống AI tự động thay thế vật thể.
+ * Trạng thái: CHƯA HOÀN THIỆN - UPDATE SAU
+ */
+
+
 import React, { useRef, useState, useEffect } from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useFormik } from 'formik';

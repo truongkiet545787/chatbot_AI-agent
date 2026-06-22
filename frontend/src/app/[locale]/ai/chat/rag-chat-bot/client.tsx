@@ -1,8 +1,18 @@
 'use client';
 
+/**
+ * TRANG CHATBOT RAG (RAG DOCUMENT CHAT)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Cho phép người dùng tải lên tài liệu văn bản (PDF, DOCX, TXT) làm cơ sở tri thức.
+ * - Trò chuyện hỏi đáp thông minh dựa trên ngữ cảnh của tài liệu đã tải lên sử dụng kỹ thuật RAG (Retrieval-Augmented Generation).
+ * Trạng thái: ĐANG PHÁT TRIỂN - UPDATE SAU (Chưa hoàn thiện phần API xử lý tài liệu ở Backend)
+ */
+
 import React, { useRef, useState } from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useFormik } from 'formik';
+
 import Container from '@/components/layouts/Container/Container';
 import AIChatContainerCommon from '@/app/[locale]/ai/_common/AIChatContainer.common';
 import AIChatItemContainerCommon from '@/app/[locale]/ai/_common/AIChatItemContainer.common';
@@ -142,8 +152,11 @@ const ChatBotClient = () => {
 		<PageWrapper>
 			<Subheader>
 				<SubheaderLeft>
-					<span className='font-semibold text-zinc-900 dark:text-zinc-100'>
+					<span className='font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
 						RAG Chatbot
+						<span className='text-xs font-normal px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/25'>
+							Đang phát triển - Update sau
+						</span>
 					</span>
 				</SubheaderLeft>
 				<SubheaderRight>

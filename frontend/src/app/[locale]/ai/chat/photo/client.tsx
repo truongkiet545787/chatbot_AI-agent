@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * TRANG CHỈNH SỬA ẢNH (PHOTO EDITING)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Tiếp nhận mô tả prompt từ người dùng để sinh ảnh mới từ AI.
+ * - Cho phép tải ảnh lên và tạo phiên bản biến thể ảnh (variation) khác biệt.
+ * - Hỗ trợ tải ảnh kết quả về thiết bị cá nhân.
+ * Trạng thái: ĐANG PHÁT TRIỂN - UPDATE SAU (Chưa hoàn thiện phần API xử lý hình ảnh ở Backend)
+ */
+
 import React, { useRef, useState } from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useFormik } from 'formik';
@@ -12,10 +22,11 @@ import AIChatInputContainerCommon from '@/app/[locale]/ai/_common/AIChatInputCon
 import FieldWrap from '@/components/form/FieldWrap';
 import Input from '@/components/form/Input';
 import { ASSISTANT, CREATED, FAILED, PENDING, SUCCESSFUL, SYSTEM, USER } from '@/constant';
-import Subheader, { SubheaderRight } from '@/components/layouts/Subheader/Subheader';
+import Subheader, { SubheaderLeft, SubheaderRight } from '@/components/layouts/Subheader/Subheader';
 import { generateImageApiCall } from '@/apiCalls/ai-demos/generateImageApiCall';
 import Image from 'next/image';
 import { generateImageVariationApiCall } from '@/apiCalls/ai-demos/generateImageVariationApiCall';
+
 
 const ChatPhotoClient = () => {
 	const [listQuestions, setListQuestions] = useState([
@@ -236,6 +247,14 @@ const ChatPhotoClient = () => {
 	return (
 		<PageWrapper>
 			<Subheader>
+				<SubheaderLeft>
+					<span className='font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
+						Chỉnh sửa ảnh
+						<span className='text-xs font-normal px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/25'>
+							Đang phát triển - Update sau
+						</span>
+					</span>
+				</SubheaderLeft>
 				<SubheaderRight>
 					<Button
 						variant='solid'

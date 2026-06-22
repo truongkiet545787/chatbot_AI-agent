@@ -1,5 +1,14 @@
 'use client';
 
+/**
+ * TRANG TRỢ LÝ NHÂN SỰ (SMART HR)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Hỗ trợ tự động tạo bản mô tả công việc (Job Description - JD) từ chức danh tuyển dụng do người dùng cung cấp.
+ * Trạng thái: CHƯA HOÀN THIỆN - UPDATE SAU
+ */
+
+
 import React, { useRef, useState } from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useFormik } from 'formik';

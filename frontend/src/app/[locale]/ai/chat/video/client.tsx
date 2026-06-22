@@ -1,5 +1,14 @@
 'use client';
 
+/**
+ * TRANG TẠO VIDEO (VIDEO GENERATION)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Tiếp nhận mô tả prompt từ người dùng và tự động tạo/sinh video ngắn tương ứng.
+ * Trạng thái: CHƯA HOÀN THIỆN - UPDATE SAU
+ */
+
+
 import React from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useFormik } from 'formik';

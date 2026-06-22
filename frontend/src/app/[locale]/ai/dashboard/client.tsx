@@ -1,5 +1,16 @@
 'use client';
 
+/**
+ * TRANG BẢNG ĐIỀU KHIỂN AI (AI DASHBOARD)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Đóng vai trò là trang chủ chào mừng của phân hệ AI.
+ * - Hiển thị danh sách các ứng dụng AI khả dụng dưới dạng các thẻ (Card) trực quan.
+ * - Hỗ trợ thanh tìm kiếm/nhập nhanh để người dùng chuyển hướng nhanh.
+ * Trạng thái: ĐÃ HOÀN THÀNH - ĐANG HOẠT ĐỘNG
+ */
+
+
 import React from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useFormik } from 'formik';

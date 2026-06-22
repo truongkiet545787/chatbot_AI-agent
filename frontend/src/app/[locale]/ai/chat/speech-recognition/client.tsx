@@ -1,5 +1,14 @@
 'use client';
 
+/**
+ * TRANG NHẬN DẠNG GIỌNG NÓI (SPEECH RECOGNITION)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Thu âm giọng nói trực tiếp từ microphone của thiết bị người dùng.
+ * - Gửi file âm thanh lên hệ thống để nhận diện và chuyển đổi giọng nói thành văn bản chữ viết.
+ * Trạng thái: ĐANG PHÁT TRIỂN - UPDATE SAU (Chưa hoàn thiện phần API xử lý Audio ở Backend)
+ */
+
 import React, { useRef, useState } from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useReactMediaRecorder } from 'react-media-recorder';
@@ -9,10 +18,11 @@ import AIChatItemContainerCommon from '@/app/[locale]/ai/_common/AIChatItemConta
 import Button from '@/components/ui/Button';
 import LoaderDotsCommon from '@/components/LoaderDots.common';
 import { ASSISTANT, CREATED, FAILED, PENDING, SUCCESSFUL, SYSTEM, USER } from '@/constant';
-import Subheader, { SubheaderRight } from '@/components/layouts/Subheader/Subheader';
+import Subheader, { SubheaderLeft, SubheaderRight } from '@/components/layouts/Subheader/Subheader';
 import WaveSurferPlayer from '@/components/WaveSurferPlayer';
 import { postSpeechToTextApiCall } from '@/apiCalls/ai-demos/postSpeechToTextApiCall';
 import Icon from '@/components/icon/Icon';
+
 
 const SpeechRecognitionClient = () => {
 	const [listQuestions, setListQuestions] = useState([
@@ -165,6 +175,14 @@ const SpeechRecognitionClient = () => {
 	return (
 		<PageWrapper>
 			<Subheader>
+				<SubheaderLeft>
+					<span className='font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2'>
+						Nhận dạng giọng nói
+						<span className='text-xs font-normal px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/25'>
+							Đang phát triển - Update sau
+						</span>
+					</span>
+				</SubheaderLeft>
 				<SubheaderRight>
 					<Button
 						variant='solid'

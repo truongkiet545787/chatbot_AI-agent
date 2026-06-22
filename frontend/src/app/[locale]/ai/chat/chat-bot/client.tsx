@@ -1,5 +1,18 @@
 'use client';
 
+/**
+ * TRANG TRỢ LÝ CHATBOT AI (AI ASSISTANT)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Trò chuyện hỏi đáp trực tiếp với trợ lý AI.
+ * - Tự động ghi nhớ ngữ cảnh cuộc hội thoại thông qua lịch sử tin nhắn.
+ * - Hỗ trợ các thẻ prompt gợi ý chủ đề hội thoại nhanh.
+ * - Hỗ trợ nút dừng phản hồi trực tiếp khi AI đang sinh văn bản.
+ * - Khóa nhập liệu tạm thời để bảo vệ luồng dữ liệu khi API đang xử lý.
+ * Trạng thái: ĐÃ HOÀN THÀNH - ĐANG HOẠT ĐỘNG
+ */
+
+
 import React, { useRef, useState } from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useFormik } from 'formik';

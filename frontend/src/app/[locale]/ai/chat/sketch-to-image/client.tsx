@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * TRANG BẢN PHÁC THẢO THÀNH ẢNH (SKETCH TO IMAGE)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Cung cấp bảng vẽ (Canvas) cho phép vẽ phác thảo bằng nét bút.
+ * - Sử dụng nét vẽ kết hợp mô tả văn bản để sinh ra một bức ảnh hoàn chỉnh.
+ * Trạng thái: CHƯA HOÀN THIỆN - UPDATE SAU
+ */
+
+
 import React, { useRef, useState, useEffect } from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useFormik } from 'formik';

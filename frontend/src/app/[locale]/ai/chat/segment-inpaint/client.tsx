@@ -1,4 +1,14 @@
 'use client';
+
+/**
+ * TRANG PHÂN VÙNG VÀ INPAINT (SEGMENTATION + INPAINT)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Thực hiện phân vùng thông minh các khu vực trên ảnh (Segmentation).
+ * - Cho phép người dùng chọn phân vùng và dùng kỹ thuật Inpaint để xóa hoặc thay thế các phần đó.
+ * Trạng thái: CHƯA HOÀN THIỆN - UPDATE SAU
+ */
+
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import Container from '@/components/layouts/Container/Container';

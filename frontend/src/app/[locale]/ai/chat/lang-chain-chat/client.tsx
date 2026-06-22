@@ -1,5 +1,14 @@
 "use client";
 
+/**
+ * TRANG CHATBOT LANGCHAIN (LANGCHAIN CHAT)
+ * --------------------------------------------------
+ * Chức năng:
+ * - Trò chuyện nâng cao sử dụng framework LangChain để quản lý bộ nhớ và các tác vụ chuỗi (chains).
+ * Trạng thái: CHƯA HOÀN THIỆN - UPDATE SAU
+ */
+
+
 import React, { useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import Container from '@/components/layouts/Container/Container';
