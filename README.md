@@ -122,3 +122,26 @@ npm run dev
 Bây giờ bạn có thể mở trình duyệt truy cập:
 *   Trang Chatbot: **`http://localhost:3000/vi/ai/chat/chat-bot`**
 *   Trang Sinh ảnh: **`http://localhost:3000/vi/ai/chat/photo`**
+
+---
+
+## 🌐 Hướng dẫn Triển khai (Deployment)
+
+### 1. Triển khai Frontend lên Netlify
+Dự án đã được cấu hình tệp `netlify.toml` ở thư mục gốc để Netlify tự động nhận diện và build Next.js:
+
+1. Đẩy dự án lên kho GitHub của bạn.
+2. Truy cập [Netlify](https://www.netlify.com/) và liên kết với tài khoản GitHub của bạn.
+3. Chọn repo `chatbot_AI-agent`. Netlify sẽ tự động nhận diện cấu hình trong `netlify.toml`:
+   - **Base directory:** `frontend`
+   - **Build command:** `npm run build`
+   - **Publish directory:** `.next`
+4. **Cấu hình biến môi trường (Environment Variables):**
+   Trong phần cấu hình Site settings -> Environment variables trên Netlify, thêm biến sau:
+   - `NEXT_PUBLIC_API_URL`: Nhập địa chỉ URL của backend sau khi đã deploy (Ví dụ: `https://your-backend.onrender.com`). Nếu không cấu hình, frontend sẽ mặc định gọi API ở `http://localhost:5000`.
+
+### 2. Triển khai Backend Flask
+Bạn có thể deploy backend Flask lên các dịch vụ như **Render**, **Railway**, hoặc **Koyeb**:
+- Đảm bảo cấu hình các biến môi trường `OPENAI_API_KEY`, `STABILITY_API_KEY` trên dịch vụ hosting backend.
+- Cấu hình domain backend nhận được vào biến `NEXT_PUBLIC_API_URL` của Netlify.
+
