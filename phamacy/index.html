@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedPregnancy - Nền Tảng Chăm Sóc Thai Kỳ Toàn Diện</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fdf4f5',
+                            100: '#fbe8eb',
+                            200: '#f7d5da',
+                            300: '#f0b4be',
+                            400: '#e58597',
+                            500: '#d55773',
+                            600: '#c13d5b',
+                            700: '#a22f49',
+                            800: '#872a3f',
+                            900: '#712738',
+                            950: '#3f111c',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(213, 87, 115, 0.2);
+            border-radius: 99px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(213, 87, 115, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 glassmorphism border-b border-slate-200 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-tr from-brand-500 to-pink-400 rounded-xl flex items-center justify-center shadow-lg shadow-brand-200 text-white">
+                        <i data-lucide="baby" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-brand-600 to-pink-600 bg-clip-text text-transparent">MedPregnancy</span>
+                        <span class="hidden sm:inline-block ml-2 px-2 py-0.5 text-[10px] font-semibold bg-brand-100 text-brand-700 rounded-full uppercase tracking-wider">PROTOTYPE</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="#about" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Về Dự Án</a>
+                    <a href="#demo-ai" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Trợ Lý AI</a>
+                    <a href="#demo-symptom" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Sàng Lọc Triệu Chứng</a>
+                    <a href="#demo-ehr" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Sổ EHR</a>
+                    <a href="#demo-telehealth" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Đặt Lịch Khám</a>
+                </nav>
+
+                <!-- Action Button -->
+                <div class="flex items-center gap-4">
+                    <a href="#interactive-suite" class="bg-gradient-to-r from-brand-600 to-pink-500 hover:from-brand-700 hover:to-pink-600 text-white px-5 py-2 rounded-xl text-sm font-semibold shadow-md shadow-brand-100 hover:shadow-lg hover:shadow-brand-200 transition-all flex items-center gap-2">
+                        <i data-lucide="play" class="w-4 h-4 fill-current"></i> Trải Nghiệm Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow">
+        
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden bg-gradient-to-b from-brand-50/50 via-white to-slate-50 py-16 sm:py-24">
+            <!-- Background Elements -->
+            <div class="absolute top-0 right-0 -mr-16 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+            <div class="absolute bottom-0 left-0 -ml-16 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style="animation-delay: 2s;"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <!-- Text Info -->
+                    <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-brand-50 border border-brand-200 text-brand-700 rounded-full text-xs font-semibold">
+                            <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span>
+                            Bản Đề Xuất Công Nghệ Y Tế 4.0
+                        </div>
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                            Người Bạn Đồng Hành <br>
+                            <span class="bg-gradient-to-r from-brand-600 to-pink-600 bg-clip-text text-transparent">Y Khoa Tin Cậy</span> Cho Mẹ Bầu
+                        </h1>
+                        <p class="text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0">
+                            MedPregnancy là giải pháp công nghệ toàn diện kết hợp trí tuệ nhân tạo (AI), hệ thống hồ sơ sức khỏe điện tử (EHR) thông minh và dịch vụ chăm sóc y tế từ xa (Telehealth) để mang lại thai kỳ an tâm, khoa học nhất.
+                        </p>
+                        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                            <a href="#interactive-suite" class="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold shadow-lg shadow-slate-200 transition-all flex items-center justify-center gap-3">
+                                Khám Phá Mô Phỏng <i data-lucide="arrow-down" class="w-5 h-5"></i>
+                            </a>
+                            <a href="#about" class="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-2xl font-bold transition-all flex items-center justify-center gap-2">
+                                Tìm hiểu ý tưởng dự án
+                            </a>
+                        </div>
+
+                        <!-- Core Pillars Badges -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 text-left">
+                            <div class="p-3 bg-white rounded-xl border border-slate-100 shadow-sm flex items-center gap-3">
+                                <div class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="sparkles" class="w-5 h-5"></i></div>
+                                <span class="text-xs font-bold text-slate-700">Trí tuệ nhân tạo AI</span>
+                            </div>
+                            <div class="p-3 bg-white rounded-xl border border-slate-100 shadow-sm flex items-center gap-3">
+                                <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="activity" class="w-5 h-5"></i></div>
+                                <span class="text-xs font-bold text-slate-700">Sàng lọc triệu chứng</span>
+                            </div>
+                            <div class="p-3 bg-white rounded-xl border border-slate-100 shadow-sm flex items-center gap-3">
+                                <div class="p-2 bg-purple-50 text-purple-600 rounded-lg"><i data-lucide="heart" class="w-5 h-5"></i></div>
+                                <span class="text-xs font-bold text-slate-700">Hồ sơ EHR điện tử</span>
+                            </div>
+                            <div class="p-3 bg-white rounded-xl border border-slate-100 shadow-sm flex items-center gap-3">
+                                <div class="p-2 bg-amber-50 text-amber-600 rounded-lg"><i data-lucide="video" class="w-5 h-5"></i></div>
+                                <span class="text-xs font-bold text-slate-700">Bác sĩ từ xa 24/7</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Side / Concept Mockup -->
+                    <div class="lg:col-span-5 relative">
+                        <div class="relative mx-auto max-w-[280px] sm:max-w-[320px] rounded-[2.5rem] border-[10px] border-slate-900 bg-slate-950 shadow-2xl overflow-hidden aspect-[9/19]">
+                            <!-- Speaker / Camera notch -->
+                            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 h-5 w-36 bg-slate-900 rounded-b-2xl z-20 flex items-center justify-center">
+                                <span class="w-2 h-2 rounded-full bg-slate-800 mr-2"></span>
+                                <span class="w-12 h-1 bg-slate-800 rounded-full"></span>
+                            </div>
+                            
+                            <!-- Phone Screen UI (Preview Screen of App) -->
+                            <div class="w-full h-full bg-slate-50 flex flex-col pt-6 overflow-y-auto no-scrollbar">
+                                <div class="p-4 flex items-center justify-between border-b border-slate-100 bg-white">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center text-xs font-bold">M</div>
+                                        <div>
+                                            <p class="text-xs font-extrabold text-slate-900 leading-none">Chị Mai Anh</p>
+                                            <p class="text-[9px] text-emerald-600 font-semibold flex items-center gap-0.5"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Thai kỳ tuần thứ 12</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-1.5">
+                                        <span class="p-1.5 bg-slate-100 rounded-full text-slate-500"><i data-lucide="bell" class="w-3.5 h-3.5"></i></span>
+                                    </div>
+                                </div>
+
+                                <!-- App Widget 1 -->
+                                <div class="p-4 space-y-3">
+                                    <div class="bg-gradient-to-tr from-brand-500 to-pink-500 text-white p-4 rounded-2xl shadow-md">
+                                        <p class="text-[10px] uppercase font-bold tracking-wider opacity-90">Kích thước của bé</p>
+                                        <h3 class="text-lg font-bold mt-0.5">Bé lớn bằng Quả Chanh Tây 🍋</h3>
+                                        <p class="text-[11px] mt-2 opacity-90 leading-relaxed">Não bộ của bé đang phát triển cực nhanh với hơn 250,000 tế bào thần kinh mới mỗi phút.</p>
+                                        <div class="mt-3 pt-2 border-t border-white/20 flex justify-between text-[10px]">
+                                            <span>Chiều dài: ~5.4 cm</span>
+                                            <span>Cân nặng: ~14 g</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- App Widget 2 -->
+                                    <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm space-y-2">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-xs font-bold text-slate-900">Huyết áp của mẹ</span>
+                                            <span class="text-[10px] font-bold text-emerald-600 px-2 py-0.5 bg-emerald-50 rounded-full">Bình thường</span>
+                                        </div>
+                                        <div class="flex items-baseline gap-1">
+                                            <span class="text-xl font-extrabold text-slate-800">115</span>
+                                            <span class="text-xs text-slate-500">/ 75 mmHg</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                            <div class="bg-emerald-500 h-full w-[70%]"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quick Actions -->
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <a href="#demo-symptom" class="p-2.5 bg-white rounded-xl border border-slate-100 flex flex-col items-center text-center hover:bg-slate-50 transition-all">
+                                            <i data-lucide="message-square" class="w-5 h-5 text-brand-500 mb-1"></i>
+                                            <span class="text-[10px] font-bold text-slate-800">Tư vấn AI</span>
+                                        </a>
+                                        <a href="#demo-telehealth" class="p-2.5 bg-white rounded-xl border border-slate-100 flex flex-col items-center text-center hover:bg-slate-50 transition-all">
+                                            <i data-lucide="video" class="w-5 h-5 text-brand-500 mb-1"></i>
+                                            <span class="text-[10px] font-bold text-slate-800">Khám từ xa</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Decorative floating element -->
+                        <div class="absolute -bottom-6 -right-6 md:right-8 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3 max-w-xs">
+                            <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center shrink-0">
+                                <i data-lucide="heart" class="w-6 h-6 fill-current"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-extrabold text-slate-900">An Toàn Cho Cả Mẹ & Bé</h4>
+                                <p class="text-[10px] text-slate-500">Thông tin được cố vấn kiểm duyệt bởi đội ngũ chuyên gia sản khoa đầu ngành.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Overview / Theoretical Proposition -->
+        <section id="about" class="py-16 bg-white border-y border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                    <h2 class="text-xs font-bold text-brand-600 uppercase tracking-widest">Đề xuất dự án MedPregnancy</h2>
+                    <h3 class="text-3xl font-extrabold text-slate-900">Tương Lai Của Chăm Sóc Thai Sản Số</h3>
+                    <p class="text-slate-600">
+                        Bản đề xuất giải quyết các khó khăn phổ biến của mẹ bầu thời đại số: sự tràn ngập thông tin không kiểm chứng, thiếu hụt công cụ theo dõi tự động hóa và rào cản địa lý khi tiếp cận y tế chất lượng cao.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Feature Card 1 -->
+                    <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:border-brand-200 hover:shadow-md transition-all space-y-4">
+                        <div class="w-12 h-12 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center">
+                            <i data-lucide="brain-circuit" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900">AI Đồng Hành Cá Nhân Hóa</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Thay thế sách hướng dẫn thai kỳ truyền thống bằng mô hình trợ lý ảo tương tác linh hoạt theo thời gian thực, điều chỉnh lời khuyên theo chính xác số tuần thai của từng mẹ bầu.
+                        </p>
+                    </div>
+
+                    <!-- Feature Card 2 -->
+                    <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:border-brand-200 hover:shadow-md transition-all space-y-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                            <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900">Phân Loại Rủi Ro Chủ Động</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Bộ lọc sàng lọc triệu chứng bằng thuật toán cây quyết định lâm sàng giúp cảnh báo sớm nguy cơ (như tiền sản giật, tiểu đường thai kỳ) và đưa ra mức khuyến cáo cấp thiết y khoa rõ ràng.
+                        </p>
+                    </div>
+
+                    <!-- Feature Card 3 -->
+                    <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:border-brand-200 hover:shadow-md transition-all space-y-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                            <i data-lucide="network" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900">Hệ Sinh Thái Đóng Liên Kết</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Liên thông dữ liệu từ EHR của mẹ trực tiếp tới hệ thống đặt lịch khám Telehealth. Bác sĩ tư vấn có thể truy cập ngay các chỉ số bất thường để chẩn đoán chính xác nhất.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Demo Suite Heading -->
+        <section id="interactive-suite" class="pt-16 pb-6 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Khu Vực Trải Nghiệm Nguyên Mẫu Thực Tế (Interactive Simulator)
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900">Mô Phỏng Các Tính Năng Cốt Lõi</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">
+                    Hãy bấm và tương tác trực tiếp với các mô-đun công nghệ của MedPregnancy phía dưới để hình dung cách ứng dụng hoạt động trong thế giới thực.
+                </p>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE APP MODULES -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 space-y-12">
+            
+            <!-- MODULE 1: AI PREGNANCY ASSISTANT -->
+            <section id="demo-ai" class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+                <!-- Left panel: Control & Slider -->
+                <div class="p-6 sm:p-10 lg:col-span-5 border-r border-slate-100 flex flex-col justify-between bg-slate-50/50">
+                    <div>
+                        <div class="flex items-center gap-2 text-brand-600 font-bold text-sm mb-3">
+                            <span class="p-1.5 bg-brand-100 rounded-lg"><i data-lucide="sparkles" class="w-4 h-4"></i></span>
+                            MODULE 1: TRỢ LÝ THAI KỲ AI
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2">Hành Trình Bé Lớn Khôn</h3>
+                        <p class="text-sm text-slate-600 mb-8 leading-relaxed">
+                            Kéo thanh trượt để mô phỏng hành trình phát triển của thai nhi từ những tuần đầu tiên của thai kỳ đến lúc chào đời. AI sẽ phân tích sự phát triển và đối chiếu với các loại quả gần gũi.
+                        </p>
+                        
+                        <!-- Slider Control -->
+                        <div class="space-y-6 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-bold text-slate-500">Tuần Thai Kỳ</span>
+                                <span class="text-3xl font-extrabold text-brand-600" id="week-display">Tuần 12</span>
+                            </div>
+                            <input type="range" id="pregnancy-week" min="4" max="40" step="4" value="12" 
+                                   class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                            <div class="flex justify-between text-xs text-slate-400 font-medium">
+                                <span>Tuần 4</span>
+                                <span>Tuần 20</span>
+                                <span>Tuần 40</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tech Spec Insight -->
+                    <div class="mt-8 pt-6 border-t border-slate-200">
+                        <div class="flex items-center gap-2 text-xs text-brand-700 font-semibold">
+                            <i data-lucide="cpu" class="w-4 h-4"></i>
+                            Công nghệ sử dụng: Gemini AI + Quy tắc y tế của WHO
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right panel: Interactive Output (Visualization) -->
+                <div class="p-6 sm:p-10 lg:col-span-7 flex flex-col justify-between">
+                    <div id="ai-output-container" class="space-y-6 transition-all duration-300">
+                        <!-- Dynamic Header info -->
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                            <div>
+                                <h4 class="text-lg font-bold text-slate-900" id="baby-title">Thai nhi 12 tuần tuổi</h4>
+                                <p class="text-sm text-brand-600 font-medium" id="trimester-display">Tam cá nguyệt thứ nhất</p>
+                            </div>
+                            <div class="px-4 py-2 bg-brand-50 rounded-xl border border-brand-100 flex items-center gap-2">
+                                <span class="text-2xl" id="fruit-emoji">🍋</span>
+                                <div>
+                                    <p class="text-[10px] text-slate-500 font-semibold leading-none uppercase">Bằng kích cỡ</p>
+                                    <p class="text-xs font-bold text-slate-800" id="fruit-name">Quả chanh tây</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Baby Image / Symbolism -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+                            <!-- SVG Visual representation -->
+                            <div class="sm:col-span-4 flex justify-center bg-brand-50/50 p-6 rounded-2xl border border-brand-100 aspect-square items-center">
+                                <div id="baby-graphic-container" class="relative w-full h-full flex items-center justify-center">
+                                    <!-- Dynamic SVG Content loaded by JS -->
+                                </div>
+                            </div>
+
+                            <!-- Numeric Specs -->
+                            <div class="sm:col-span-8 grid grid-cols-2 gap-4">
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                    <span class="text-xs text-slate-500 block">Chiều dài trung bình</span>
+                                    <span class="text-lg font-bold text-slate-800" id="baby-length">~ 5.4 cm</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                    <span class="text-xs text-slate-500 block">Cân nặng trung bình</span>
+                                    <span class="text-lg font-bold text-slate-800" id="baby-weight">~ 14 gram</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 col-span-2">
+                                    <span class="text-xs text-slate-500 block">Bộ phận nổi bật đang phát triển</span>
+                                    <span class="text-sm font-bold text-brand-700" id="baby-organs">Hình thành vân tay, móng tay</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Clinical Recommendation -->
+                        <div class="bg-amber-50/80 rounded-2xl p-4 border border-amber-100 space-y-2">
+                            <div class="flex items-center gap-2 text-amber-800 font-bold text-sm">
+                                <i data-lucide="stethoscope" class="w-4 h-4"></i>
+                                Cố vấn Y khoa MedPregnancy AI khuyên mẹ:
+                            </div>
+                            <p class="text-sm text-slate-700 leading-relaxed" id="ai-clinical-advice">
+                                Hãy thực hiện đo độ mờ da gáy để sàng lọc các dị tật bẩm sinh trong tuần 11 đến 13. Tăng cường axit folic và canxi thông qua dinh dưỡng hàng ngày.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 2: SYMPTOM CHECKER CHATBOT -->
+            <section id="demo-symptom" class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+                <!-- Left Panel: Chat Window -->
+                <div class="lg:col-span-7 flex flex-col h-[520px] bg-slate-900 text-white">
+                    <!-- Chat Header -->
+                    <div class="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white">
+                                <i data-lucide="bot" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold leading-none">Chatbot Sàng Lọc Triệu Chứng</h4>
+                                <span class="text-[10px] text-emerald-400 font-medium">Trí Tuệ Nhân Tạo Kết Nối Thật</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <!-- API config info -->
+                            <span id="api-status-badge" class="px-2 py-0.5 bg-slate-800 text-[9px] text-slate-400 rounded-full font-mono">Simulated</span>
+                            <button onclick="resetSymptomChat()" class="text-slate-400 hover:text-white transition-colors text-xs flex items-center gap-1">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Làm mới
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Messages List -->
+                    <div id="chat-messages" class="flex-grow p-4 overflow-y-auto space-y-4 text-sm scrollbar-thin">
+                        <!-- Bot Message -->
+                        <div class="flex items-start gap-2.5 max-w-[85%]">
+                            <div class="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center shrink-0 text-xs font-bold text-white">B</div>
+                            <div class="bg-slate-800 p-3 rounded-2xl rounded-tl-none">
+                                Chào mẹ! Mình là Trợ lý Sàng lọc Triệu chứng của MedPregnancy. Mẹ đang cảm thấy cơ thể có dấu hiệu bất thường nào dưới đây không ạ? Hãy chọn một hoặc nhập triệu chứng của mẹ nhé.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Symptoms Options -->
+                    <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex flex-wrap gap-2">
+                        <button onclick="handleQuickSymptom('Đau đầu dữ dội')" class="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full font-medium transition-all">🤯 Đau đầu dữ dội</button>
+                        <button onclick="handleQuickSymptom('Chảy máu nhẹ')" class="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full font-medium transition-all">🩸 Chảy máu nhẹ</button>
+                        <button onclick="handleQuickSymptom('Ốm nghén nghiêm trọng')" class="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full font-medium transition-all">🤢 Ốm nghén nặng</button>
+                        <button onclick="handleQuickSymptom('Sưng phù chân tay')" class="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full font-medium transition-all">🦶 Sưng chân tay</button>
+                    </div>
+
+                    <!-- Chat Input Field -->
+                    <form onsubmit="sendUserSymptomForm(event)" class="p-3 bg-slate-950 flex items-center gap-2">
+                        <input type="text" id="symptom-input" placeholder="Hoặc nhập triệu chứng khác..." class="flex-grow bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <button type="submit" class="bg-brand-600 hover:bg-brand-500 text-white p-2.5 rounded-xl transition-all">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right Panel: Clinical Warning Alert System -->
+                <div class="p-6 sm:p-10 lg:col-span-5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm mb-3">
+                            <span class="p-1.5 bg-emerald-100 rounded-lg"><i data-lucide="activity" class="w-4 h-4"></i></span>
+                            MODULE 2: HỆ THỐNG PHÂN LOẠI CẢNH BÁO
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2">Đánh Giá Mức Độ An Toàn</h3>
+                        <p class="text-sm text-slate-600 mb-6">
+                            Hệ thống sẽ lập tức phân tích triệu chứng để đưa ra mức độ khẩn cấp, khuyến nghị hành động y khoa ngay khi mẹ nhập dữ liệu.
+                        </p>
+
+                        <!-- Dynamic Alert Box -->
+                        <div id="warning-alert-card" class="p-5 rounded-2xl border transition-all duration-300 bg-slate-50 border-slate-200 text-slate-700 space-y-4">
+                            <div class="flex items-center gap-3">
+                                <div id="warning-icon-box" class="p-2 bg-slate-200 text-slate-600 rounded-xl">
+                                    <i id="warning-icon" data-lucide="help-circle" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400 font-semibold uppercase leading-none">Phân cấp y tế</p>
+                                    <h4 id="warning-level" class="text-base font-bold text-slate-800">Chưa có thông tin</h4>
+                                </div>
+                            </div>
+                            <p id="warning-desc" class="text-xs leading-relaxed text-slate-500">
+                                Hãy chọn một triệu chứng thường gặp bên trái hoặc tự nhập biểu hiện hiện tại của mẹ để xem thuật toán AI đánh giá mức độ rủi ro ngay lập tức.
+                            </p>
+                            <!-- Clinical suggestion trigger link -->
+                            <div id="quick-action-link" class="hidden pt-3 border-t border-slate-200 flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-700">Khuyến nghị:</span>
+                                <a href="#demo-telehealth" class="text-brand-600 font-bold hover:underline flex items-center gap-1">Đặt lịch với bác sĩ ngay <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Educational Notice -->
+                    <div class="mt-8 p-3 bg-blue-50/50 rounded-xl border border-blue-100 text-[11px] text-blue-700 leading-relaxed">
+                        ⚠️ <strong>Lưu ý quan trọng:</strong> Mẫu thử nghiệm này chỉ có tác dụng sàng lọc rủi ro ban đầu dựa trên lâm sàng và không thay thế cho chẩn đoán chuyên sâu từ bác sĩ.
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 3: ELECTRONIC HEALTH RECORD (EHR DEMO) -->
+            <section id="demo-ehr" class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+                <!-- Left Panel: Data Controls & Input -->
+                <div class="p-6 sm:p-10 lg:col-span-4 bg-slate-50/50 border-r border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 text-purple-600 font-bold text-sm mb-3">
+                            <span class="p-1.5 bg-purple-100 rounded-lg"><i data-lucide="heart" class="w-4 h-4"></i></span>
+                            MODULE 3: SỔ SỨC KHỎE EHR
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2">Đo Lường Chỉ Số Mẹ</h3>
+                        <p class="text-sm text-slate-600 mb-8 leading-relaxed">
+                            Mô phỏng nhật ký sức khỏe mẹ bầu. Bạn có thể thay đổi các thông số sinh tồn của mẹ dưới đây để xem biểu đồ biến động và hệ thống phản hồi cảnh báo thông minh hoạt động.
+                        </p>
+
+                        <!-- Input Controllers -->
+                        <div class="space-y-4">
+                            <!-- Input 1: Systolic Blood Pressure -->
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-xs font-bold text-slate-700">Huyết áp Tâm thu (mmHg)</label>
+                                    <span class="text-sm font-extrabold text-slate-800" id="val-systolic">120</span>
+                                </div>
+                                <input type="range" id="sys-range" min="90" max="170" value="120" class="w-full accent-purple-600">
+                            </div>
+
+                            <!-- Input 2: Weight Tracker -->
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-xs font-bold text-slate-700">Mức Tăng Cân Nặng (kg)</label>
+                                    <span class="text-sm font-extrabold text-slate-800" id="val-weight">8 kg</span>
+                                </div>
+                                <input type="range" id="weight-range" min="0" max="25" value="8" class="w-full accent-purple-600">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alert Indicator inside controls -->
+                    <div id="ehr-sys-alert" class="mt-8 p-3 bg-emerald-50 text-emerald-800 border border-emerald-100 rounded-xl text-xs flex items-center gap-2">
+                        <i data-lucide="check-circle" class="w-5 h-5 shrink-0" id="ehr-alert-icon"></i>
+                        <span id="ehr-alert-text">Các chỉ số của mẹ hiện đang ở ngưỡng rất an toàn. Tiếp tục duy trì chế độ sinh hoạt lành mạnh nhé!</span>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Visual Chart & Diagnostics -->
+                <div class="p-6 sm:p-10 lg:col-span-8 flex flex-col justify-between">
+                    <div class="space-y-6">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div>
+                                <h4 class="text-lg font-bold text-slate-900">Biểu đồ Theo Dõi Thai Kỳ</h4>
+                                <p class="text-xs text-slate-500">Cập nhật theo thời gian thực dựa trên các tuần thai</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="toggleEhrChart('bp')" id="btn-chart-bp" class="px-3 py-1.5 bg-purple-600 text-white rounded-lg text-xs font-semibold transition-all">Huyết Áp</button>
+                                <button onclick="toggleEhrChart('weight')" id="btn-chart-weight" class="px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-semibold transition-all">Cân Nặng</button>
+                            </div>
+                        </div>
+
+                        <!-- Chart container -->
+                        <div class="relative bg-slate-50 p-4 rounded-2xl border border-slate-100 h-[260px] flex items-center justify-center">
+                            <canvas id="ehrChart" class="w-full h-full"></canvas>
+                        </div>
+
+                        <!-- Mini EHR Stats -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-center">
+                                <span class="text-[10px] uppercase font-bold text-slate-400">Đường Huyết (Đói)</span>
+                                <span class="block text-lg font-extrabold text-slate-800 mt-1">4.8 mmol/L</span>
+                                <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full inline-block mt-1">Bình thường</span>
+                            </div>
+                            <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-center">
+                                <span class="text-[10px] uppercase font-bold text-slate-400">Protein Niệu</span>
+                                <span class="block text-lg font-extrabold text-slate-800 mt-1">Âm Tính (-)</span>
+                                <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full inline-block mt-1">Bình thường</span>
+                            </div>
+                            <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-center">
+                                <span class="text-[10px] uppercase font-bold text-slate-400">Nhịp tim thai nhi</span>
+                                <span class="block text-lg font-extrabold text-slate-800 mt-1">142 bpm</span>
+                                <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full inline-block mt-1">Bình thường</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 4: TELEHEALTH APPOINTMENT RESERVATION -->
+            <section id="demo-telehealth" class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+                <!-- Left panel: Form Reservation -->
+                <div class="p-6 sm:p-10 lg:col-span-7 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 text-amber-600 font-bold text-sm mb-3">
+                            <span class="p-1.5 bg-amber-100 rounded-lg"><i data-lucide="video" class="w-4 h-4"></i></span>
+                            MODULE 4: ĐẶT LỊCH TELEHEALTH 24/7
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2">Đặt Hẹn Tư Vấn Trực Tuyến</h3>
+                        <p class="text-sm text-slate-600 mb-6">
+                            Lựa chọn bác sĩ chuyên khoa phụ sản hàng đầu và đăng ký thời gian để nhận cuộc gọi video chất lượng cao hỗ trợ mẹ giải quyết lo lắng.
+                        </p>
+
+                        <!-- Interactive Booking Form -->
+                        <form id="booking-form" onsubmit="handleBooking(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="space-y-1">
+                                    <label class="text-xs font-bold text-slate-700">Họ & Tên Mẹ Bầu</label>
+                                    <input type="text" required id="booking-name" value="Nguyễn Mai Anh" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-xs font-bold text-slate-700">Số Điện Thoại</label>
+                                    <input type="tel" required id="booking-phone" value="0912345678" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="space-y-1">
+                                    <label class="text-xs font-bold text-slate-700">Chọn Bác Sĩ Chuyên Khoa</label>
+                                    <select id="booking-doctor" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                        <option value="BS. Nguyễn Thị Minh (Bệnh viện Phụ sản TW)">BS. Nguyễn Thị Minh (Bệnh viện Phụ sản TW)</option>
+                                        <option value="ThS.BS. Lê Văn Hoàng (Bệnh viện Từ Dũ)">ThS.BS. Lê Văn Hoàng (Bệnh viện Từ Dũ)</option>
+                                        <option value="BSCKII. Vũ Mai Phương (Bệnh viện Hùng Vương)">BSCKII. Vũ Mai Phương (Bệnh viện Hùng Vương)</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-xs font-bold text-slate-700">Khung Giờ Đặt Hẹn</label>
+                                    <input type="datetime-local" required id="booking-time" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl text-sm font-bold shadow-md shadow-amber-100 transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="check-square" class="w-4 h-4"></i> Gửi Yêu Cầu Đăng Ký
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right panel: Doctor list & Booking Result Status -->
+                <div class="p-6 sm:p-10 lg:col-span-5 bg-slate-50/50 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-800 mb-4">Danh sách Bác sĩ Đồng hành</h4>
+                        
+                        <!-- List of doctors -->
+                        <div class="space-y-3">
+                            <div class="p-3 bg-white border border-slate-100 rounded-xl flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-600 font-bold flex items-center justify-center text-xs">MINH</div>
+                                <div>
+                                    <h5 class="text-xs font-bold text-slate-800">BS. Nguyễn Thị Minh</h5>
+                                    <p class="text-[10px] text-slate-500">Chuyên gia Sản khoa & Hỗ trợ sinh sản</p>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-white border border-slate-100 rounded-xl flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 font-bold flex items-center justify-center text-xs">HOÀNG</div>
+                                <div>
+                                    <h5 class="text-xs font-bold text-slate-800">ThS.BS. Lê Văn Hoàng</h5>
+                                    <p class="text-[10px] text-slate-500">Chuyên gia Sàng lọc và Chẩn đoán tiền sản</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Booking Card Result -->
+                        <div id="booking-result" class="hidden mt-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl space-y-2">
+                            <div class="flex items-center gap-2 text-xs font-bold text-emerald-800">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                                ĐĂNG KÝ THÀNH CÔNG!
+                            </div>
+                            <p class="text-[11px] leading-relaxed">
+                                Lịch hẹn của mẹ <strong><span id="res-name">Mai Anh</span></strong> đã được lên lịch thành công với <strong><span id="res-doc">BS. Minh</span></strong> vào lúc <span id="res-time" class="font-semibold text-brand-700"></span>.
+                            </p>
+                            <p class="text-[10px] text-emerald-700">Hệ thống đã chuẩn bị phòng khám ảo Telehealth. Hãy kiểm tra SMS của mẹ.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Column 1: Intro -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gradient-to-tr from-brand-500 to-pink-400 rounded-lg flex items-center justify-center text-white">
+                            <i data-lucide="baby" class="w-5 h-5"></i>
+                        </div>
+                        <span class="text-lg font-bold text-white">MedPregnancy</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Nền tảng công nghệ y khoa chăm sóc sức khoẻ toàn diện dành riêng cho mẹ và bé suốt thời kỳ thai nghén.
+                    </p>
+                </div>
+                <!-- Column 2: Quick Links -->
+                <div>
+                    <h4 class="text-sm font-bold text-white mb-4">Liên Kết Nhanh</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#about" class="hover:text-brand-400 transition-colors">Về Dự Án</a></li>
+                        <li><a href="#demo-ai" class="hover:text-brand-400 transition-colors">Trợ Lý AI</a></li>
+                        <li><a href="#demo-symptom" class="hover:text-brand-400 transition-colors">Sàng Lọc Triệu Chứng</a></li>
+                        <li><a href="#demo-ehr" class="hover:text-brand-400 transition-colors">Sổ Sức Khỏe EHR</a></li>
+                        <li><a href="#demo-telehealth" class="hover:text-brand-400 transition-colors">Đặt Lịch Telehealth</a></li>
+                    </ul>
+                </div>
+                <!-- Column 3: Contact Info -->
+                <div>
+                    <h4 class="text-sm font-bold text-white mb-4">Liên Hệ</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li class="flex items-center gap-2"><i data-lucide="mail" class="w-3.5 h-3.5 text-brand-500"></i> support@medpregnancy.vn</li>
+                        <li class="flex items-center gap-2"><i data-lucide="phone" class="w-3.5 h-3.5 text-brand-500"></i> 1900 6868 (Giờ hành chính)</li>
+                        <li class="flex items-center gap-2"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-500"></i> Hà Nội, Việt Nam</li>
+                    </ul>
+                </div>
+                <!-- Column 4: Tech Stack -->
+                <div class="space-y-3">
+                    <h4 class="text-sm font-bold text-white mb-4">Thông Tin Công Nghệ</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Phiên bản prototype ứng dụng AI kết hợp Netlify Functions chạy mô hình Gemini 1.5 Flash.
+                    </p>
+                    <div class="flex gap-3 text-slate-500">
+                        <i data-lucide="github" class="w-5 h-5 hover:text-white cursor-pointer transition-colors"></i>
+                        <i data-lucide="globe" class="w-5 h-5 hover:text-white cursor-pointer transition-colors"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-slate-800 text-center text-[10px] text-slate-500">
+                &copy; 2026 MedPregnancy Project. All rights reserved. Phát triển vì sức khỏe cộng đồng.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Script logic -->
+    <script>
+        // --- 1. CONFIGURATION & STATE ---
+        let currentChartType = 'bp'; // 'bp' or 'weight'
+        let myChart = null;
+
+        // Milestones Data for Module 1
+        const milestones = {
+            4: {
+                title: "Thai nhi 4 tuần tuổi",
+                trimester: "Tam cá nguyệt thứ nhất",
+                fruitEmoji: "🪹",
+                fruitName: "Hạt anh túc",
+                length: "~ 0.2 cm",
+                weight: "~ 0.1 gram",
+                organs: "Phôi thai đang bám tổ, hình thành các lớp tế bào ban đầu.",
+                advice: "Bổ sung Axit Folic (400mcg/ngày) ngay lập tức để phòng dị tật ống thần kinh. Tránh tiếp xúc khói thuốc và tự ý dùng thuốc.",
+                color: "#d97706",
+                svg: `<circle cx="50" cy="50" r="4" fill="#78350f" /><circle cx="50" cy="50" r="1" fill="#f59e0b" />`
+            },
+            8: {
+                title: "Thai nhi 8 tuần tuổi",
+                trimester: "Tam cá nguyệt thứ nhất",
+                fruitEmoji: "🍓",
+                fruitName: "Quả mâm xôi",
+                length: "~ 1.6 cm",
+                weight: "~ 1 gram",
+                organs: "Tim thai hoạt động rộn ràng (150-170 nhịp/phút). Bắt đầu nhô ra cánh tay và chân.",
+                advice: "Nên có lịch khám thai lần đầu tiên để xác nhận vị trí túi thai và tim thai đập bình thường. Tiếp tục bổ sung vitamin.",
+                color: "#e11d48",
+                svg: `<g fill="#be123c">
+                    <circle cx="45" cy="45" r="8" /><circle cx="55" cy="45" r="8" />
+                    <circle cx="50" cy="55" r="8" /><circle cx="42" cy="52" r="8" /><circle cx="58" cy="52" r="8" />
+                    <rect x="48" y="32" width="4" height="8" rx="2" fill="#15803d" transform="rotate(-10 50 36)" />
+                </g>`
+            },
+            12: {
+                title: "Thai nhi 12 tuần tuổi",
+                trimester: "Tam cá nguyệt thứ nhất",
+                fruitEmoji: "🍋",
+                fruitName: "Quả chanh tây",
+                length: "~ 5.4 cm",
+                weight: "~ 14 gram",
+                organs: "Hình thành móng tay, vân tay. Bé bắt đầu ngọ nguậy, cơ bắp tập phản xạ.",
+                advice: "Mốc quan trọng: Thực hiện siêu âm đo độ mờ da gáy và xét nghiệm Double Test sàng lọc dị tật Down từ tuần 11-13.",
+                color: "#facc15",
+                svg: `<g>
+                    <ellipse cx="50" cy="50" rx="22" ry="16" fill="#facc15" />
+                    <circle cx="72" cy="50" r="3" fill="#eab308" />
+                    <path d="M 38 40 Q 30 30 45 28" stroke="#15803d" stroke-width="3" fill="none" />
+                    <path d="M 45 28 C 50 25, 52 35, 45 35 Z" fill="#16a34a" />
+                </g>`
+            },
+            16: {
+                title: "Thai nhi 16 tuần tuổi",
+                trimester: "Tam cá nguyệt thứ hai",
+                fruitEmoji: "🥑",
+                fruitName: "Quả bơ",
+                length: "~ 12 cm",
+                weight: "~ 100 gram",
+                organs: "Bé biết mút tay, chớp mắt nhẹ. Hệ tuần hoàn và tiết niệu hoạt động tốt.",
+                advice: "Nếu chưa làm Double Test, hãy làm Triple Test tuần 16-18. Tăng cường canxi vì xương bé đang phát triển mạnh mẽ.",
+                color: "#16a34a",
+                svg: `<g>
+                    <path d="M 50 24 C 36 24, 32 44, 32 58 C 32 72, 42 76, 50 76 C 58 76, 68 72, 68 58 C 68 44, 64 24, 50 24 Z" fill="#4ade80" />
+                    <path d="M 50 28 C 40 28, 36 44, 36 58 C 36 68, 44 72, 50 72 C 56 72, 64 68, 64 58 C 64 44, 60 28, 50 28 Z" fill="#bbf7d0" />
+                    <circle cx="50" cy="58" r="10" fill="#78350f" />
+                </g>`
+            },
+            20: {
+                title: "Thai nhi 20 tuần tuổi",
+                trimester: "Tam cá nguyệt thứ hai",
+                fruitEmoji: "🍌",
+                fruitName: "Quả chuối",
+                length: "~ 25 cm",
+                weight: "~ 300 gram",
+                organs: "Thính giác phát triển rõ rệt, bé bắt đầu nghe được giọng nói của mẹ. Cơ thể phủ lông tơ.",
+                advice: "Mốc siêu âm 4D hình thái thai nhi để khảo sát kỹ tim, phổi, não, các bộ phận của bé. Cho bé nghe nhạc nhẹ nhàng.",
+                color: "#eab308",
+                svg: `<g>
+                    <path d="M 32 40 Q 42 66, 70 48 Q 50 74, 32 40 Z" fill="#fef08a" stroke="#eab308" stroke-width="2" />
+                    <path d="M 70 48 L 74 46" stroke="#854d0e" stroke-width="3" />
+                    <path d="M 32 40 L 29 42" stroke="#854d0e" stroke-width="3" />
+                </g>`
+            },
+            24: {
+                title: "Thai nhi 24 tuần tuổi",
+                trimester: "Tam cá nguyệt thứ hai",
+                fruitEmoji: "🍈",
+                fruitName: "Quả dưa lưới nhỏ",
+                length: "~ 30 cm",
+                weight: "~ 600 gram",
+                organs: "Phổi hình thành các phế nang. Vị giác phát triển, bé có cảm nhận ngọt/mặn.",
+                advice: "Mốc làm nghiệm pháp đường huyết tầm soát tiểu đường thai kỳ (từ tuần 24-28). Hạn chế ăn quá nhiều đồ ngọt.",
+                color: "#86efac",
+                svg: `<g>
+                    <circle cx="50" cy="50" r="23" fill="#fca5a5" />
+                    <circle cx="50" cy="50" r="21" fill="#fef08a" />
+                    <path d="M 50 29 C 45 40, 55 45, 50 71 M 33 40 C 45 42, 40 58, 67 60 M 35 58 Q 50 50, 65 40" stroke="#fca5a5" stroke-width="1.5" fill="none" />
+                </g>`
+            },
+            28: {
+                title: "Thai nhi 28 tuần tuổi",
+                trimester: "Tam cá nguyệt thứ ba",
+                fruitEmoji: "🍆",
+                fruitName: "Quả cà tím",
+                length: "~ 38 cm",
+                weight: "~ 1000 gram",
+                organs: "Não phát triển vượt bậc. Bé biết nhắm mắt, mở mắt và có chu kỳ ngủ - thức đều đặn.",
+                advice: "Tiêm phòng Uốn ván mũi 1 (hoặc theo chỉ định). Bắt đầu theo dõi và đếm cử động thai (máy thai) mỗi ngày để đảm bảo bé khỏe.",
+                color: "#7c3aed",
+                svg: `<g>
+                    <path d="M 50 25 C 44 25, 42 35, 42 45 C 42 55, 34 60, 34 68 C 34 76, 41 80, 50 80 C 59 80, 66 76, 66 68 C 66 60, 58 55, 58 45 C 58 35, 56 25, 50 25 Z" fill="#5b21b6" />
+                    <path d="M 50 25 L 50 20 C 50 18, 48 16, 44 16" fill="none" stroke="#16a34a" stroke-width="3" />
+                    <path d="M 44 24 C 47 28, 53 28, 56 24" fill="#15803d" />
+                </g>`
+            },
+            32: {
+                title: "Thai nhi 32 tuần tuổi",
+                trimester: "Tam cá nguyệt thứ ba",
+                fruitEmoji: "🎃",
+                fruitName: "Quả bí đỏ nhỏ",
+                length: "~ 42 cm",
+                weight: "~ 1700 gram",
+                organs: "Xương dần cứng cáp trừ hộp sọ. Ngôi thai bắt đầu quay đầu xuống phía dưới.",
+                advice: "Khám thai đều đặn mỗi 2 tuần. Theo dõi lượng nước ối và vị trí bám bánh rau qua siêu âm.",
+                color: "#ea580c",
+                svg: `<g fill="#f97316">
+                    <ellipse cx="50" cy="50" rx="24" ry="20" />
+                    <ellipse cx="50" cy="50" rx="16" ry="20" fill="#ea580c" />
+                    <ellipse cx="50" cy="50" rx="8" ry="20" fill="#c2410c" />
+                    <rect x="48" y="24" width="4" height="8" rx="1" fill="#16a34a" />
+                </g>`
+            },
+            36: {
+                title: "Thai nhi 36 tuần tuổi",
+                trimester: "Tam cá nguyệt thứ ba",
+                fruitEmoji: "🥬",
+                fruitName: "Cải romaine",
+                length: "~ 47 cm",
+                weight: "~ 2600 gram",
+                organs: "Mỡ dưới da tích tụ giúp bé mũm mĩm. Hệ hô hấp và tiêu hóa sẵn sàng cho môi trường bên ngoài.",
+                advice: "Khám thai hàng tuần từ tuần 36. Xét nghiệm dịch âm đạo sàng lọc liên cầu khuẩn nhóm B (GBS) bảo vệ bé khi sinh.",
+                color: "#22c55e",
+                svg: `<g fill="#22c55e">
+                    <path d="M 50 20 C 40 30, 36 50, 38 75 C 44 76, 56 76, 62 75 C 64 50, 60 30, 50 20 Z" fill="#86efac" />
+                    <path d="M 50 20 C 45 35, 40 50, 44 75" fill="none" stroke="#22c55e" stroke-width="2" />
+                    <path d="M 50 20 C 55 35, 60 50, 56 75" fill="none" stroke="#22c55e" stroke-width="2" />
+                    <path d="M 44 32 C 38 40, 35 55, 41 72" fill="none" stroke="#16a34a" stroke-width="1.5" />
+                    <path d="M 56 32 C 62 40, 65 55, 59 72" fill="none" stroke="#16a34a" stroke-width="1.5" />
+                </g>`
+            },
+            40: {
+                title: "Thai nhi 40 tuần tuổi",
+                trimester: "Tam cá nguyệt thứ ba",
+                fruitEmoji: "🍉",
+                fruitName: "Quả dưa hấu",
+                length: "~ 51 cm",
+                weight: "~ 3400 gram",
+                organs: "Bé phát triển hoàn thiện, sẵn sàng chào đời bất cứ lúc nào.",
+                advice: "Theo dõi sát các dấu hiệu chuyển dạ: Cơn co tử cung đều đặn tăng dần, ra dịch màu hồng (nút nhầy), rỉ ối. Sẵn sàng nhập viện.",
+                color: "#10b981",
+                svg: `<g>
+                    <circle cx="50" cy="50" r="23" fill="#15803d" />
+                    <circle cx="50" cy="50" r="21" fill="#22c55e" />
+                    <path d="M 40 28 Q 50 50, 42 72 M 50 27 Q 45 50, 58 73 M 59 28 Q 63 50, 51 72" stroke="#15803d" stroke-width="3" fill="none" />
+                </g>`
+            }
+        };
+
+        // Chatbot Predefined responses (Method 1)
+        const symptomResponses = {
+            "chay mau": {
+                level: "Nguy cấp (Đỏ) - Yêu cầu nhập viện khẩn cấp",
+                levelClass: "danger",
+                advice: "🩸 Ra máu âm đạo trong thai kỳ có thể là dấu hiệu động thai, rau tiền đạo, hoặc dọa sảy thai. \n\nMẹ cần nằm yên tại chỗ, tuyệt đối không được tự ý đi lại và hãy nhờ người nhà đưa đến Bệnh viện Sản khoa gần nhất ngay lập tức, hoặc liên hệ Hotline cấp cứu 115.",
+                alertClass: "bg-red-50 border-red-200 text-red-900",
+                iconClass: "bg-red-100 text-red-600",
+                icon: "alert-triangle"
+            },
+            "dau dau": {
+                level: "Nguy cấp (Đỏ) - Nguy cơ Tiền sản giật",
+                levelClass: "danger",
+                advice: "🤯 Đau đầu dữ dội (đặc biệt đi kèm hoa mắt, chóng mặt hoặc sưng phù tay chân) là dấu hiệu cảnh báo cao của Tiền sản giật do tăng huyết áp đột ngột. \n\nMẹ cần đo huyết áp ngay lập tức nếu có máy tại nhà, uống nhiều nước ấm và liên hệ bác sĩ sản khoa của mẹ hoặc đến viện khám ngay.",
+                alertClass: "bg-red-50 border-red-200 text-red-900",
+                iconClass: "bg-red-100 text-red-600",
+                icon: "alert-triangle"
+            },
+            "nghen": {
+                level: "Cần chú ý (Vàng) - Ốm nghén thai kỳ",
+                levelClass: "warning",
+                advice: "🤢 Ốm nghén nhiều khiến mẹ không ăn uống được dẫn đến mệt mỏi, thiếu nước. \n\nMẹ nên chia nhỏ các bữa ăn thành nhiều cữ nhỏ, tránh thức ăn cay nóng nhiều dầu mỡ. Uống nước gừng ấm, ngậm chanh gừng để giảm nôn. Nếu nôn liên tục không thể giữ nước trong người, mẹ cần đi viện truyền dịch bổ sung.",
+                alertClass: "bg-amber-50 border-amber-200 text-amber-900",
+                iconClass: "bg-amber-100 text-amber-600",
+                icon: "alert-circle"
+            },
+            "sung phu": {
+                level: "Cần chú ý (Vàng) - Phù nề chân tay",
+                levelClass: "warning",
+                advice: "🦶 Phù nề chân tay ở cuối thai kỳ do chèn ép tĩnh mạch khá phổ biến. Tuy nhiên, nếu phù đột ngột ở cả tay, mặt và kèm đau đầu, mẹ hãy kiểm tra huyết áp. \n\nMẹ nên hạn chế đứng lâu, khi nằm ngủ kê cao chân hơn tim bằng gối mềm, ăn nhạt bớt muối và không đi giày quá chật.",
+                alertClass: "bg-amber-50 border-amber-200 text-amber-900",
+                iconClass: "bg-amber-100 text-amber-600",
+                icon: "alert-circle"
+            },
+            "dau lung": {
+                level: "An toàn (Xanh) - Cân bằng sinh lý",
+                levelClass: "normal",
+                advice: "🧘 Đau lưng nhẹ là triệu chứng rất phổ biến do cột sống nâng đỡ trọng lượng thai nhi tăng lên. \n\nMẹ nên giữ tư thế thẳng lưng, tập thể dục nhẹ nhàng (yoga bầu), tắm nước ấm và tránh mang vác vật nặng. Bạn có thể sử dụng gối ôm bà bầu để có giấc ngủ ngon hơn.",
+                alertClass: "bg-emerald-50 border-emerald-200 text-emerald-900",
+                iconClass: "bg-emerald-100 text-emerald-600",
+                icon: "check-circle"
+            },
+            "mac dinh": {
+                level: "An toàn (Xanh) - Nhận định ban đầu",
+                levelClass: "normal",
+                advice: "🌸 Cảm ơn mẹ đã chia sẻ. Triệu chứng này bước đầu cho thấy chưa có dấu hiệu nguy hiểm cấp bách. \n\nMẹ hãy tiếp tục lắng nghe cơ thể, ăn uống đủ chất, uống nhiều nước và đi khám thai định kỳ đúng hẹn. Nếu có bất kỳ dấu hiệu bất thường trở nên nghiêm trọng, hãy tư vấn y khoa ngay nhé.",
+                alertClass: "bg-slate-50 border-slate-200 text-slate-700",
+                iconClass: "bg-slate-100 text-slate-600",
+                icon: "help-circle"
+            }
+        };
+
+        // EHR historical data
+        const ehrData = {
+            bp: [110, 112, 115, 118, 120, 118, 122, 120, 122, 120],
+            weight: [0.5, 1.2, 2.5, 4.0, 5.5, 7.0, 8.5, 10.2, 11.5, 12.0],
+            labels: ['Tuần 4', 'Tuần 8', 'Tuần 12', 'Tuần 16', 'Tuần 20', 'Tuần 24', 'Tuần 28', 'Tuần 32', 'Tuần 36', 'Tuần 40']
+        };
+
+        // --- 2. INITIALIZATION ON DOM LOAD ---
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            
+            // Module 1 Init
+            initMilestones();
+            
+            // Module 2 Init
+            resetSymptomChat();
+            
+            // Module 3 Init
+            initEhrChart();
+            setupEhrControls();
+
+            // Check if API status
+            detectApiStatus();
+        });
+
+        // Detect if Netlify function or Local API is running
+        async function detectApiStatus() {
+            const badge = document.getElementById('api-status-badge');
+            try {
+                // Try to ping our netlify function or check local storage api
+                const testCall = await fetch('/.netlify/functions/chat', { method: 'OPTIONS' }).catch(() => null);
+                if (testCall && testCall.ok) {
+                    badge.innerText = "Gemini AI";
+                    badge.classList.remove('bg-slate-800', 'text-slate-400');
+                    badge.classList.add('bg-emerald-500', 'text-white');
+                } else {
+                    badge.innerText = "Giả Lập Y Khoa";
+                }
+            } catch (e) {
+                badge.innerText = "Giả Lập Y Khoa";
+            }
+        }
+
+        // --- 3. MODULE 1: AI PREGNANCY ASSISTANT LOGIC ---
+        function initMilestones() {
+            const weekSlider = document.getElementById('pregnancy-week');
+            
+            // Listen to slider change
+            weekSlider.addEventListener('input', (e) => {
+                updateMilestoneView(e.target.value);
+            });
+
+            // Initial view
+            updateMilestoneView(12);
+        }
+
+        function updateMilestoneView(week) {
+            const data = milestones[week];
+            if (!data) return;
+
+            // Update DOM Elements
+            document.getElementById('week-display').innerText = `Tuần ${week}`;
+            document.getElementById('baby-title').innerText = data.title;
+            document.getElementById('trimester-display').innerText = data.trimester;
+            document.getElementById('fruit-emoji').innerText = data.fruitEmoji;
+            document.getElementById('fruit-name').innerText = data.fruitName;
+            document.getElementById('baby-length').innerText = data.length;
+            document.getElementById('baby-weight').innerText = data.weight;
+            document.getElementById('baby-organs').innerText = data.organs;
+            document.getElementById('ai-clinical-advice').innerText = data.advice;
+
+            // Render SVG graphics
+            const container = document.getElementById('baby-graphic-container');
+            container.innerHTML = `
+                <svg viewBox="0 0 100 100" class="w-24 h-24 transition-all duration-300">
+                    <!-- Background Soft circle -->
+                    <circle cx="50" cy="50" r="45" fill="${data.color}15" />
+                    <!-- Inner SVG Graphics -->
+                    ${data.svg}
+                </svg>
+            `;
+            
+            // Re-render icons if needed
+            lucide.createIcons();
+        }
+
+        // --- 4. MODULE 2: SYMPTOM CHECKER CHATBOT LOGIC ---
+        let chatHistory = [];
+
+        function resetSymptomChat() {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = `
+                <!-- Bot Welcome Message -->
+                <div class="flex items-start gap-2.5 max-w-[85%]">
+                    <div class="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center shrink-0 text-xs font-bold text-white">B</div>
+                    <div class="bg-slate-800 p-3 rounded-2xl rounded-tl-none">
+                        Chào mẹ! Mình là Trợ lý Sàng lọc Triệu chứng của MedPregnancy. Mẹ đang cảm thấy cơ thể có dấu hiệu bất thường nào dưới đây không ạ? Hãy chọn một hoặc nhập triệu chứng của mẹ nhé.
+                    </div>
+                </div>
+            `;
+            chatHistory = [
+                { role: "system", content: "Bạn là Trợ lý Sàng lọc Triệu chứng của dự án MedPregnancy. Hãy phân tích triệu chứng thai kỳ của mẹ bầu một cách ân cần, khoa học, chuyên nghiệp bằng tiếng Việt. Luôn đưa ra lời khuyên y tế rõ ràng và nhấn mạnh tầm quan trọng của việc thăm khám bác sĩ đối với các dấu hiệu nguy hiểm." }
+            ];
+
+            // Reset warning system
+            updateWarningSystem("mac dinh");
+        }
+
+        function appendChatMessage(role, content) {
+            const chatMessages = document.getElementById('chat-messages');
+            const isUser = role === 'user';
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex items-start gap-2.5 max-w-[85%] ${isUser ? 'ml-auto justify-end' : ''}`;
+            
+            if (isUser) {
+                msgDiv.innerHTML = `
+                    <div class="bg-brand-600 p-3 rounded-2xl rounded-tr-none text-white text-right">
+                        ${content.replace(/\n/g, '<br>')}
+                    </div>
+                    <div class="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center shrink-0 text-xs font-bold text-white">M</div>
+                `;
+            } else {
+                msgDiv.innerHTML = `
+                    <div class="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center shrink-0 text-xs font-bold text-white">B</div>
+                    <div class="bg-slate-800 p-3 rounded-2xl rounded-tl-none text-slate-100">
+                        ${content.replace(/\n/g, '<br>')}
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showChatbotTyping() {
+            const chatMessages = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = "bot-typing";
+            typingDiv.className = "flex items-start gap-2.5 max-w-[85%] animate-pulse";
+            typingDiv.innerHTML = `
+                <div class="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center shrink-0 text-xs font-bold text-white">B</div>
+                <div class="bg-slate-800 p-3 rounded-2xl rounded-tl-none text-slate-400 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.3s"></span>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeChatbotTyping() {
+            const typingDiv = document.getElementById('bot-typing');
+            if (typingDiv) typingDiv.remove();
+        }
+
+        function updateWarningSystem(keywordKey) {
+            const card = document.getElementById('warning-alert-card');
+            const iconBox = document.getElementById('warning-icon-box');
+            const levelText = document.getElementById('warning-level');
+            const descText = document.getElementById('warning-desc');
+            const actionLink = document.getElementById('quick-action-link');
+            
+            const warningData = symptomResponses[keywordKey] || symptomResponses["mac dinh"];
+            
+            // Clean classes
+            card.className = `p-5 rounded-2xl border transition-all duration-300 ${warningData.alertClass}`;
+            iconBox.className = `p-2 rounded-xl shrink-0 ${warningData.iconClass}`;
+            
+            levelText.innerText = warningData.level;
+            descText.innerText = warningData.advice;
+
+            // Setup icons dynamically
+            const iconEl = iconBox.querySelector('i') || iconBox;
+            iconEl.setAttribute('data-lucide', warningData.icon);
+
+            if (warningData.levelClass === 'danger' || warningData.levelClass === 'warning') {
+                actionLink.classList.remove('hidden');
+            } else {
+                actionLink.classList.add('hidden');
+            }
+
+            lucide.createIcons();
+        }
+
+        // Parse key symptom from text
+        function parseSymptomKey(text) {
+            const lowerText = text.toLowerCase();
+            if (lowerText.includes("máu") || lowerText.includes("chảy máu") || lowerText.includes("ra máu") || lowerText.includes("xuất huyết")) {
+                return "chay mau";
+            }
+            if (lowerText.includes("đau đầu") || lowerText.includes("chóng mặt") || lowerText.includes("mờ mắt") || lowerText.includes("nhức đầu")) {
+                return "dau dau";
+            }
+            if (lowerText.includes("nghén") || lowerText.includes("nôn") || lowerText.includes("oẹ") || lowerText.includes("mửa")) {
+                return "nghen";
+            }
+            if (lowerText.includes("phù") || lowerText.includes("sưng") || lowerText.includes("sưng chân")) {
+                return "sung phu";
+            }
+            if (lowerText.includes("đau lưng") || lowerText.includes("mỏi lưng")) {
+                return "dau lung";
+            }
+            return "mac dinh";
+        }
+
+        async function processBotResponse(userMsg) {
+            showChatbotTyping();
+            
+            // Append history
+            chatHistory.push({ role: "user", content: userMsg });
+
+            // Analyze symptom client-side to update dashboard instantly
+            const symptomKey = parseSymptomKey(userMsg);
+            updateWarningSystem(symptomKey);
+
+            // Call real API (Netlify serverless function)
+            try {
+                const response = await fetch('/.netlify/functions/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: chatHistory })
+                });
+
+                removeChatbotTyping();
+                const data = await response.json();
+
+                if (response.ok && data.content) {
+                    appendChatMessage("assistant", data.content);
+                    chatHistory.push({ role: "assistant", content: data.content });
+                } else {
+                    throw new Error("API error");
+                }
+            } catch (e) {
+                // Fallback to local clinical advice templates
+                removeChatbotTyping();
+                const localAdvice = symptomResponses[symptomKey].advice;
+                const botFallbackReply = `[Chế độ Ngoại tuyến] \n\n${localAdvice}`;
+                appendChatMessage("assistant", botFallbackReply);
+                chatHistory.push({ role: "assistant", content: botFallbackReply });
+            }
+        }
+
+        function handleQuickSymptom(symptomText) {
+            appendChatMessage("user", symptomText);
+            processBotResponse(symptomText);
+        }
+
+        function sendUserSymptomForm(e) {
+            e.preventDefault();
+            const input = document.getElementById('symptom-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendChatMessage("user", text);
+            input.value = "";
+            processBotResponse(text);
+        }
+
+        // --- 5. MODULE 3: EHR HEALTH MONITOR LOGIC ---
+        function initEhrChart() {
+            const ctx = document.getElementById('ehrChart').getContext('2d');
+            
+            // Define gradients
+            const purpleGradient = ctx.createLinearGradient(0, 0, 0, 200);
+            purpleGradient.addColorStop(0, 'rgba(124, 58, 237, 0.4)');
+            purpleGradient.addColorStop(1, 'rgba(124, 58, 237, 0.01)');
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ehrData.labels,
+                    datasets: [{
+                        label: 'Huyết Áp Tâm Thu (mmHg)',
+                        data: ehrData.bp,
+                        borderColor: '#7c3aed',
+                        backgroundColor: purpleGradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#7c3aed',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(226, 232, 240, 0.6)' },
+                            ticks: { font: { size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleEhrChart(type) {
+            currentChartType = type;
+            const btnBp = document.getElementById('btn-chart-bp');
+            const btnWeight = document.getElementById('btn-chart-weight');
+            const ctx = document.getElementById('ehrChart').getContext('2d');
+
+            if (type === 'bp') {
+                btnBp.className = "px-3 py-1.5 bg-purple-600 text-white rounded-lg text-xs font-semibold transition-all";
+                btnWeight.className = "px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-semibold transition-all";
+                
+                const purpleGradient = ctx.createLinearGradient(0, 0, 0, 200);
+                purpleGradient.addColorStop(0, 'rgba(124, 58, 237, 0.4)');
+                purpleGradient.addColorStop(1, 'rgba(124, 58, 237, 0.01)');
+
+                myChart.data.datasets[0] = {
+                    label: 'Huyết Áp Tâm Thu (mmHg)',
+                    data: ehrData.bp,
+                    borderColor: '#7c3aed',
+                    backgroundColor: purpleGradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#7c3aed',
+                    pointBorderColor: '#fff',
+                    pointHoverRadius: 6
+                };
+            } else {
+                btnWeight.className = "px-3 py-1.5 bg-brand-600 text-white rounded-lg text-xs font-semibold transition-all";
+                btnBp.className = "px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg text-xs font-semibold transition-all";
+                
+                const pinkGradient = ctx.createLinearGradient(0, 0, 0, 200);
+                pinkGradient.addColorStop(0, 'rgba(213, 87, 115, 0.4)');
+                pinkGradient.addColorStop(1, 'rgba(213, 87, 115, 0.01)');
+
+                myChart.data.datasets[0] = {
+                    label: 'Mức Tăng Cân Nặng (kg)',
+                    data: ehrData.weight,
+                    borderColor: '#d55773',
+                    backgroundColor: pinkGradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#d55773',
+                    pointBorderColor: '#fff',
+                    pointHoverRadius: 6
+                };
+            }
+            myChart.update();
+        }
+
+        function setupEhrControls() {
+            const sysRange = document.getElementById('sys-range');
+            const weightRange = document.getElementById('weight-range');
+
+            sysRange.addEventListener('input', (e) => {
+                const val = parseInt(e.target.value);
+                document.getElementById('val-systolic').innerText = val;
+                
+                // Update latest point on chart for BP
+                ehrData.bp[ehrData.bp.length - 1] = val;
+                if (currentChartType === 'bp') {
+                    myChart.data.datasets[0].data = ehrData.bp;
+                    myChart.update();
+                }
+
+                evaluateHealthAlert(val, parseFloat(weightRange.value));
+            });
+
+            weightRange.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                document.getElementById('val-weight').innerText = `${val} kg`;
+                
+                // Update latest point on chart for Weight
+                ehrData.weight[ehrData.weight.length - 1] = val;
+                if (currentChartType === 'weight') {
+                    myChart.data.datasets[0].data = ehrData.weight;
+                    myChart.update();
+                }
+
+                evaluateHealthAlert(parseInt(sysRange.value), val);
+            });
+        }
+
+        function evaluateHealthAlert(systolic, weight) {
+            const alertBox = document.getElementById('ehr-sys-alert');
+            const alertIcon = document.getElementById('ehr-alert-icon');
+            const alertText = document.getElementById('ehr-alert-text');
+
+            if (systolic >= 140) {
+                // Danger High BP
+                alertBox.className = "mt-8 p-3 bg-red-50 text-red-800 border border-red-100 rounded-xl text-xs flex items-center gap-2 transition-all duration-300";
+                alertIcon.setAttribute('data-lucide', 'alert-triangle');
+                alertText.innerHTML = `<strong>Cảnh báo:</strong> Huyết áp tâm thu cao (<strong>${systolic} mmHg</strong>), mẹ có nguy cơ bị tiền sản giật! Hãy ngồi nghỉ ngơi chỗ mát và đo lại sau 15 phút. Nếu vẫn cao hãy liên hệ bác sĩ gấp.`;
+            } else if (systolic <= 90) {
+                // Low BP
+                alertBox.className = "mt-8 p-3 bg-amber-50 text-amber-800 border border-amber-100 rounded-xl text-xs flex items-center gap-2 transition-all duration-300";
+                alertIcon.setAttribute('data-lucide', 'alert-circle');
+                alertText.innerHTML = `<strong>Lưu ý:</strong> Huyết áp tâm thu hơi thấp (<strong>${systolic} mmHg</strong>). Mẹ nên uống một cốc trà gừng ấm hoặc nước ấm, nằm nghỉ ngơi nghiêng trái.`;
+            } else if (weight >= 18) {
+                // Excessive weight gain
+                alertBox.className = "mt-8 p-3 bg-amber-50 text-amber-800 border border-amber-100 rounded-xl text-xs flex items-center gap-2 transition-all duration-300";
+                alertIcon.setAttribute('data-lucide', 'alert-circle');
+                alertText.innerHTML = `<strong>Lưu ý:</strong> Mẹ tăng cân khá nhanh (<strong>+${weight} kg</strong>). Hãy tham khảo ý kiến bác sĩ dinh dưỡng tiết chế bớt tinh bột và đồ ngọt để phòng tiểu đường thai kỳ.`;
+            } else {
+                // Normal
+                alertBox.className = "mt-8 p-3 bg-emerald-50 text-emerald-800 border border-emerald-100 rounded-xl text-xs flex items-center gap-2 transition-all duration-300";
+                alertIcon.setAttribute('data-lucide', 'check-circle');
+                alertText.innerHTML = `Các chỉ số của mẹ hiện đang ở ngưỡng rất an toàn (Huyết áp: ${systolic} mmHg, Tăng cân: ${weight} kg). Tiếp tục duy trì chế độ sinh hoạt lành mạnh nhé!`;
+            }
+
+            lucide.createIcons();
+        }
+
+        // --- 6. MODULE 4: TELEHEALTH RESERVATION LOGIC ---
+        function handleBooking(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('booking-name').value;
+            const phone = document.getElementById('booking-phone').value;
+            const doctor = document.getElementById('booking-doctor').value;
+            const timeVal = document.getElementById('booking-time').value;
+
+            if (!name || !phone || !timeVal) return;
+
+            // Formatting datetime
+            const date = new Date(timeVal);
+            const formattedTime = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ngày ' + date.toLocaleDateString('vi-VN');
+
+            // Set result details
+            document.getElementById('res-name').innerText = name;
+            
+            // Extract short doctor name
+            const shortDoc = doctor.split('(')[0].trim();
+            document.getElementById('res-doc').innerText = shortDoc;
+            document.getElementById('res-time').innerText = formattedTime;
+
+            // Show result card
+            const resultCard = document.getElementById('booking-result');
+            resultCard.classList.remove('hidden');
+            resultCard.classList.add('animate-bounce');
+            setTimeout(() => {
+                resultCard.classList.remove('animate-bounce');
+            }, 1000);
+
+            // Clear input fields
+            document.getElementById('booking-time').value = "";
+        }
+    </script>
+</body>
+</html>

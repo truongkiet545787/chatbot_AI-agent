@@ -1,0 +1,9 @@
+# Local Env file
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Local Netlify folder
+.netlify
