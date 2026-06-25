@@ -4,6 +4,7 @@ import { AI_DEMOS_URI, HOST } from '@/constant';
 export function generateImageVariationApiCall(data: {
 	dataToPost: {
 		base64: string;
+		prompt?: string;
 	};
 }) {
 	const { dataToPost } = data;

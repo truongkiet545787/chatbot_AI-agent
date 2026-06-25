@@ -160,9 +160,10 @@ const AiSubheaderPartial = () => {
 			</SubheaderLeft>
 			<SubheaderRight>
 				<Link href={`${appPages.aiAppPages.subPages.aiDashboardPage.to}`}>
-					<Button variant='solid' icon='HeroPlus'>
-						New Chat
-					</Button>
+					<button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:via-purple-400 hover:to-pink-400 text-white text-sm font-semibold rounded-xl shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+						<Icon icon='HeroPlus' size='text-lg' />
+						<span>New Chat</span>
+					</button>
 				</Link>
 			</SubheaderRight>
 		</Subheader>

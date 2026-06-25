@@ -98,6 +98,12 @@ const DefaultAsideTemplate = () => {
 								{...appPages.aiAppPages.subPages.chatPages.subPages.photoPage}
 							/>
 							<NavItem
+								{...appPages.aiAppPages.subPages.chatPages.subPages.photoDrawPage}
+							/>
+							<NavItem
+								{...appPages.aiAppPages.subPages.chatPages.subPages.replaceObject}
+							/>
+							<NavItem
 								{...appPages.aiAppPages.subPages.chatPages.subPages.audioPage}
 							/>
 							<NavItem

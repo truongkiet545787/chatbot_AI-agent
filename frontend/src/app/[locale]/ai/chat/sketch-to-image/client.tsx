@@ -159,11 +159,16 @@ const ChatPhotoClient = () => {
 	const sendImageToAPI = async () => {
         const base64Image = canvasToBase64();
         if (base64Image) {
+            if (!formik.values.textField) {
+                alert("Vui lòng nhập mô tả prompt trước khi tạo ảnh.");
+                return;
+            }
             setAskGptApiStatus(PENDING);
             try {
                 const response = await sketchToImageApiCall({
                     dataToPost: {
                         base64: base64Image,
+                        prompt: formik.values.textField,
                     },
                 });
 				const imageKey = response.data.image; // Adjust according to the actual response structure
@@ -213,7 +218,27 @@ const ChatPhotoClient = () => {
 						)}
 					</div>
 				</div>
-				<div>
+				<div style={{ marginTop: '20px' }}>
+					<input
+						type="text"
+						id="textField"
+						name="textField"
+						placeholder="Mô tả bức ảnh bạn muốn vẽ (ví dụ: a beautiful cat, 3d render)..."
+						value={formik.values.textField}
+						onChange={formik.handleChange}
+						style={{
+							width: '100%',
+							padding: '12px 16px',
+							borderRadius: '12px',
+							border: '1px solid #e4e4e7',
+							fontSize: '14px',
+							outline: 'none',
+							boxSizing: 'border-box',
+							backgroundColor: '#fff'
+						}}
+					/>
+				</div>
+				<div style={{ display: 'flex', gap: '10px' }}>
 					<Button
 						style={{ marginTop: '20px' }}
 							icon='save'
@@ -222,7 +247,7 @@ const ChatPhotoClient = () => {
 							{askGptApiStatus === PENDING ? 'Generating...' : 'Generate'}
 					</Button>
                     <Button
-						style={{ marginTop: '20px', marginLeft: '10px' }}
+						style={{ marginTop: '20px' }}
 						color='red'
 						variant='solid'
                         onClick={clearCanvas}
@@ -230,7 +255,7 @@ const ChatPhotoClient = () => {
 						Clear Canvas
 					</Button>
 					<Button
-						style={{ marginTop: '20px', marginLeft: '10px' }}
+						style={{ marginTop: '20px' }}
 						color='red'
 						variant='solid'
 						onClick={saveImage}

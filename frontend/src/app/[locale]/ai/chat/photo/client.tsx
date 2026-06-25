@@ -41,6 +41,10 @@ const ChatPhotoClient = () => {
 	const [askGptApiStatus, setAskGptApiStatus] = useState(CREATED);
 	const stopGeneratingRef = useRef(false);
 
+	const [uploadedImageBase64, setUploadedImageBase64] = useState<string | null>(null);
+	const [uploadedImagePreview, setUploadedImagePreview] = useState<string | null>(null);
+	const fileInputRef = useRef<HTMLInputElement>(null);
+
 	const formik = useFormik({
 		onSubmit(): void | Promise<never> {
 			return undefined;
@@ -62,16 +66,31 @@ const ChatPhotoClient = () => {
 		}
 	}, []);
 
-	const generateVariationOnClick = async (base64: string) => {
+	const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = (event) => {
+				const result = event.target?.result as string;
+				setUploadedImagePreview(result);
+				const base64Str = result.split(',')[1];
+				setUploadedImageBase64(base64Str);
+			};
+			reader.readAsDataURL(file);
+		}
+	};
+
+	const generateVariationOnClick = async (base64: string, prompt?: string) => {
 		try {
 			stopGeneratingRef.current = false;
 			if (base64) {
+				const displayPrompt = prompt || 'Create variation';
 				setListQuestions((prev) => {
 					return [
 						...prev,
 						{
 							role: USER,
-							content: 'Create variation',
+							content: `Create variation of: "${displayPrompt}"`,
 						},
 					];
 				});
@@ -79,6 +98,7 @@ const ChatPhotoClient = () => {
 				generateImageVariationApiCall({
 					dataToPost: {
 						base64,
+						prompt: displayPrompt,
 					},
 				})
 					.then((res) => {
@@ -110,37 +130,73 @@ const ChatPhotoClient = () => {
 			if (question) {
 				formik.resetForm();
 				setAskGptApiStatus(PENDING);
+				
+				const imageToSend = uploadedImageBase64;
 				setListQuestions([
 					...listQuestions,
 					{
 						role: USER,
 						content: question,
+						base64: imageToSend || '',
 					},
 				]);
-				generateImageApiCall({
-					dataToPost: {
-						prompt: question,
-					},
-				})
-					.then((res) => {
-						if (res?.status === 200) {
-							setAskGptApiStatus(SUCCESSFUL);
-							if (!stopGeneratingRef.current) {
-								setListQuestions((prev) => {
-									return [
-										...prev,
-										{
-											role: ASSISTANT,
-											base64: res?.data?.b64_json,
-										} as IChatImage,
-									];
-								});
-							}
-						}
+
+				setUploadedImagePreview(null);
+				setUploadedImageBase64(null);
+				if (fileInputRef.current) fileInputRef.current.value = '';
+
+				if (imageToSend) {
+					generateImageVariationApiCall({
+						dataToPost: {
+							base64: imageToSend,
+							prompt: question,
+						},
 					})
-					.catch((e) => {
-						setAskGptApiStatus(FAILED);
-					});
+						.then((res) => {
+							if (res?.status === 200) {
+								setAskGptApiStatus(SUCCESSFUL);
+								if (!stopGeneratingRef.current) {
+									setListQuestions((prev) => {
+										return [
+											...prev,
+											{
+												role: ASSISTANT,
+												base64: res?.data?.b64_json,
+											} as IChatImage,
+										];
+									});
+								}
+							}
+						})
+						.catch((e) => {
+							setAskGptApiStatus(FAILED);
+						});
+				} else {
+					generateImageApiCall({
+						dataToPost: {
+							prompt: question,
+						},
+					})
+						.then((res) => {
+							if (res?.status === 200) {
+								setAskGptApiStatus(SUCCESSFUL);
+								if (!stopGeneratingRef.current) {
+									setListQuestions((prev) => {
+										return [
+											...prev,
+											{
+												role: ASSISTANT,
+												base64: res?.data?.b64_json,
+											} as IChatImage,
+										];
+									});
+								}
+							}
+						})
+						.catch((e) => {
+							setAskGptApiStatus(FAILED);
+						});
+				}
 			}
 		} catch {
 			// FIXME
@@ -197,11 +253,13 @@ const ChatPhotoClient = () => {
 											<Button
 												icon='HeroDocumentDuplicate'
 												variant='solid'
-												onClick={() =>
+												onClick={() => {
+													const originalPrompt = index > 0 ? questions[index - 1]?.content : '';
 													generateVariationOnClick(
 														question?.base64 as string,
-													)
-												}
+														originalPrompt
+													);
+												}}
 												color='zinc'>
 												Create variation
 											</Button>
@@ -269,8 +327,7 @@ const ChatPhotoClient = () => {
 					</span>
 				</SubheaderLeft>
 				<SubheaderRight>
-					<Button
-						variant='solid'
+					<button
 						onClick={() =>
 							setListQuestions([
 								{
@@ -279,19 +336,45 @@ const ChatPhotoClient = () => {
 								},
 							])
 						}
-						icon='HeroPlus'>
-						New Chat
-					</Button>
+						className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-400 hover:via-purple-400 hover:to-pink-400 text-white text-sm font-semibold rounded-xl shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+						<Icon icon='HeroPlus' size='text-lg' />
+						<span>New Chat</span>
+					</button>
 				</SubheaderRight>
 			</Subheader>
 			<Container className='flex shrink-0 grow basis-auto flex-col pb-0'>
 				{generateChat(listQuestions)}
 				<AIChatInputContainerCommon>
+					{uploadedImagePreview && (
+						<div className="relative flex items-center gap-2 mb-3 p-2 bg-zinc-50 dark:bg-zinc-800/40 rounded-xl border border-zinc-200 dark:border-zinc-800 w-fit">
+							<div className="relative w-16 h-16 rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700">
+								<img src={uploadedImagePreview} alt="Upload preview" className="w-full h-full object-cover" />
+							</div>
+							<button
+								type="button"
+								onClick={() => {
+									setUploadedImagePreview(null);
+									setUploadedImageBase64(null);
+									if (fileInputRef.current) fileInputRef.current.value = '';
+								}}
+								className="absolute -top-1.5 -right-1.5 p-1 bg-rose-600 hover:bg-rose-500 text-white rounded-full transition-all shadow-md animate-none">
+								<Icon icon="HeroXMark" size="text-xs" />
+							</button>
+						</div>
+					)}
 					<div className='relative flex items-center w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl focus-within:border-indigo-500/80 focus-within:ring-2 focus-within:ring-indigo-500/10 focus-within:shadow-indigo-500/5 transition-all duration-300 p-2 shadow-lg'>
 						{/* Nút cộng tải tệp lên cực đẹp */}
+						<input
+							type="file"
+							ref={fileInputRef}
+							accept="image/*"
+							onChange={handleFileUpload}
+							className="hidden"
+						/>
 						<button
 							type='button'
 							aria-label='Tải tệp lên'
+							onClick={() => fileInputRef.current?.click()}
 							className='p-2.5 bg-zinc-50 dark:bg-zinc-800/50 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 text-zinc-500 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400 rounded-xl transition-all duration-200 flex items-center justify-center hover:scale-[1.03] active:scale-[0.97] shrink-0 shadow-sm'>
 							<Icon icon='HeroPlus' size='text-xl' />
 						</button>
