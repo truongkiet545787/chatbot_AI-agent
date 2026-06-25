@@ -6,6 +6,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 
 export const authOptions = {
 	// Configure one or more authentication providers
+	secret: process.env.NEXTAUTH_SECRET || 'super-secret-key-123456',
 	pages: {
 		signIn: '/login',
 		// signOut: '/auth/signout',
