@@ -7,7 +7,7 @@ const nextConfig = {
 		});
 		return config;
 	},
-	output: 'standalone',
+	output: process.env.NETLIFY ? undefined : 'standalone',
 	images: {
 		remotePatterns: [
 			{
