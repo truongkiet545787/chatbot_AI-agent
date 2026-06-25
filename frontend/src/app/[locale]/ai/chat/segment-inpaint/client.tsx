@@ -13,9 +13,10 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import Container from '@/components/layouts/Container/Container';
 import Button from '@/components/ui/Button';
+import { HOST } from '@/constant';
 
-const DATA_API_ENDPOINT = 'http://127.0.0.1:5000/data';
-const REPLACE_OBJECT_API_ENDPOINT = 'http://127.0.0.1:5000/replace-object';
+const DATA_API_ENDPOINT = `${HOST}/data`;
+const REPLACE_OBJECT_API_ENDPOINT = `${HOST}/replace-object`;
 
 const ChatPhotoClient = () => {
     const imageCanvasRef = useRef(null);
