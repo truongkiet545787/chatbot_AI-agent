@@ -22,7 +22,7 @@ const poppins = Poppins({
 	preload: false,
 	style: ['normal', 'italic'],
 	weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-	subsets: ['devanagari', 'latin', 'latin-ext'],
+	subsets: ['devanagari', 'latin', 'latin-ext', 'vietnamese'],
 });
 
 export const metadata: Metadata = {

@@ -13,7 +13,7 @@
  */
 
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import PageWrapper from '@/components/layouts/PageWrapper/PageWrapper';
 import { useFormik } from 'formik';
 import Container from '@/components/layouts/Container/Container';
@@ -85,6 +85,18 @@ const ChatBotClient = () => {
 			textField: '',
 		},
 	});
+
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			const params = new URLSearchParams(window.location.search);
+			const initialPrompt = params.get('prompt');
+			if (initialPrompt) {
+				const newUrl = window.location.pathname;
+				window.history.replaceState({}, '', newUrl);
+				sendQuestionOnClick(initialPrompt);
+			}
+		}
+	}, []);
 
 	const suggestions = [
 		{

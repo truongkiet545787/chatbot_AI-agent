@@ -28,7 +28,7 @@ const AIChatItemContainerCommon: FC<IAIChatItemContainerCommonProps> = (props) =
 	return (
 		<div
 			className={classNames(
-				'col-span-12 w-full flex items-start gap-4 mb-6',
+				'col-span-12 w-full flex items-start gap-4 mb-6 animate-chat-entry',
 				{ 'justify-end': !isAnswer, 'justify-start': isAnswer },
 				className,
 			)}
@@ -51,10 +51,10 @@ const AIChatItemContainerCommon: FC<IAIChatItemContainerCommonProps> = (props) =
 				className={classNames(
 					'max-w-[85%] md:max-w-[75%] rounded-2xl p-4 shadow-sm text-sm leading-relaxed transition-all duration-300',
 					{
-						// Nền và chữ cho User
-						'bg-indigo-600 dark:bg-indigo-700 text-white rounded-tr-none shadow-indigo-900/10': !isAnswer,
-						// Nền và chữ cho AI (Glassmorphic)
-						'bg-white dark:bg-zinc-900/90 text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-850 rounded-tl-none': isAnswer,
+						// Nền và chữ cho User (Premium Gradient)
+						'bg-gradient-to-tr from-indigo-600 via-indigo-700 to-violet-600 hover:from-indigo-550 hover:to-violet-550 text-white rounded-tr-none shadow-md shadow-indigo-500/10 hover:shadow-lg hover:shadow-indigo-500/15 duration-200': !isAnswer,
+						// Nền và chữ cho AI (Glassmorphic soft zinc)
+						'bg-zinc-50/90 dark:bg-zinc-900/60 text-zinc-800 dark:text-zinc-200 border border-zinc-200/50 dark:border-zinc-800/80 rounded-tl-none shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700/80 duration-200': isAnswer,
 					}
 				)}>
 				
@@ -69,14 +69,15 @@ const AIChatItemContainerCommon: FC<IAIChatItemContainerCommonProps> = (props) =
 								'text-zinc-800 dark:text-zinc-200': isAnswer
 							}
 						)} 
+						showLineNumbers={false}
 					/>
 				)}
 				{children}
 			</div>
 
-			{/* User Avatar (Hiển thị bên phải nếu là User) */}
+			{/* User Avatar (Hiển thị bên phải nếu là User - Premium Gradient Border) */}
 			{!isAnswer && (
-				<div className='w-9 h-9 rounded-xl bg-slate-200 dark:bg-zinc-800 flex items-center justify-center shrink-0 border border-zinc-300/30 dark:border-zinc-700/30'>
+				<div className='w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-400 to-blue-600 flex items-center justify-center shrink-0 shadow-md border border-sky-400/20'>
 					<Avatar
 						src={userImage}
 						className='w-full h-full'
