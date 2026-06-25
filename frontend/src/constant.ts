@@ -5,8 +5,8 @@ export const PROTONX_LOGO = {
 
 export const getHOST = () => {
 	return process.env.REACT_APP_STAGE === 'production'
-		? 'http://localhost:5001'
-		: 'http://localhost:5001';
+		? 'http://localhost:5000'
+		: 'http://localhost:5000';
 };
 
 export const HOST = getHOST();

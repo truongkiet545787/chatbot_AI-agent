@@ -153,7 +153,7 @@ const ChatPhotoClient = () => {
 					{questions?.map((question, index) => {
 						return (
 							<AIChatItemContainerCommon
-								key={question?.content}
+								key={`${question?.role}-${index}`}
 								content={question?.content}
 								userName={question?.role === USER ? 'You' : 'AI'}
 								isAnswer={

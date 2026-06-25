@@ -1,6 +1,6 @@
 from openai import OpenAI
 
-class OpenAIClient:
+class OpenAIService:
     def __init__(self, api_key):
         # Thiết lập base_url của OpenRouter để chuyển hướng API
         self.client = OpenAI(

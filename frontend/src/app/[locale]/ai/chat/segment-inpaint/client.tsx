@@ -15,7 +15,7 @@ import Container from '@/components/layouts/Container/Container';
 import Button from '@/components/ui/Button';
 
 const DATA_API_ENDPOINT = 'http://127.0.0.1:5000/data';
-const REPLACE_OBJECT_API_ENDPOINT = 'http://127.0.0.1:5001/replace-object';
+const REPLACE_OBJECT_API_ENDPOINT = 'http://127.0.0.1:5000/replace-object';
 
 const ChatPhotoClient = () => {
     const imageCanvasRef = useRef(null);

@@ -170,7 +170,7 @@
     <div id="sidebarBackdrop" onclick="toggleSidebar()" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden md:hidden transition-opacity"></div>
 
     <!-- MAIN CHAT CANVAS (BÊN PHẢI) -->
-    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden md:pl-72">
         
         <!-- Header -->
         <header class="h-16 px-4 md:px-6 border-b border-slate-900/50 flex items-center justify-between z-10 glass-panel bg-slate-950/20">
@@ -317,6 +317,7 @@
             return 'Cuộc hội thoại mới';
         }
 
+        // Lưu State vào LocalStorage
         function saveChatsToStorage() {
             localStorage.setItem('kinal_ai_chats', JSON.stringify(chats));
             renderHistoryList();
@@ -522,7 +523,6 @@
             html = html.replace(/^\s*&gt;\s+(.+)$/gm, '<blockquote>$1</blockquote>');
 
             // 6. Bullet lists
-            // Tách các dòng bắt đầu bằng dấu gạch ngang hoặc sao
             html = html.replace(/^\s*[-*]\s+(.+)$/gm, '<li>$1</li>');
             html = html.replace(/(<li>.*<\/li>)/s, '<ul class="my-2">$1</ul>');
 
@@ -536,7 +536,6 @@
             html = html.replace(/^\s*#\s+(.+)$/gm, '<h1>$1</h1>');
 
             // 9. Đổi dấu xuống dòng thành thẻ <br>
-            // Tránh xuống dòng kép trong danh sách hoặc code block
             html = html.replace(/\n/g, '<br>');
             html = html.replace(/<\/li><br>/g, '</li>');
             html = html.replace(/<\/ul><br>/g, '</ul>');
@@ -552,8 +551,6 @@
             const codeEl = document.getElementById(id);
             if (!codeEl) return;
             
-            // Lấy văn bản thô chưa unescaped (để copy chuẩn nhất)
-            // Vì chúng ta escapeHtml lúc đầu, ta cần convert ngược lại hoặc lấy innerText
             const textToCopy = codeEl.innerText;
             
             navigator.clipboard.writeText(textToCopy).then(() => {
@@ -570,7 +567,6 @@
         };
 
         function appendMessageUI(role, content) {
-            // Xóa màn hình chào mừng nếu là tin nhắn đầu tiên
             if (chatMessages.querySelector('.max-w-2xl')) {
                 chatMessages.innerHTML = '';
             }
