@@ -1,5 +1,11 @@
+'use client';
+
 import React from 'react';
-import ChatAudioClient from '@/app/[locale]/ai/chat/text-to-speech/client';
+import dynamic from 'next/dynamic';
+
+const ChatAudioClient = dynamic(() => import('@/app/[locale]/ai/chat/text-to-speech/client'), {
+	ssr: false,
+});
 
 const ChatPage = () => {
 	return <ChatAudioClient />;
