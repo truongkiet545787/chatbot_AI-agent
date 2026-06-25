@@ -26,6 +26,7 @@ import Subheader, { SubheaderLeft, SubheaderRight } from '@/components/layouts/S
 import { generateImageApiCall } from '@/apiCalls/ai-demos/generateImageApiCall';
 import Image from 'next/image';
 import { generateImageVariationApiCall } from '@/apiCalls/ai-demos/generateImageVariationApiCall';
+import Icon from '@/components/icon/Icon';
 
 
 const ChatPhotoClient = () => {
@@ -274,44 +275,56 @@ const ChatPhotoClient = () => {
 			<Container className='flex shrink-0 grow basis-auto flex-col pb-0'>
 				{generateChat(listQuestions)}
 				<AIChatInputContainerCommon>
-					<FieldWrap
-						firstSuffix={
-							<Button
-								icon='HeroPlus'
-								variant={formik.values.textField ? 'default' : 'solid'}
-								rounded='rounded'
-								className='me-2'
-								aria-label='Upload file'
-							/>
-						}
-						lastSuffix={
-							formik.values?.textField ? (
-								<Button
-									className='ms-2'
-									variant='solid'
-									onClick={() => sendQuestionOnClick(formik.values?.textField)}
-									rounded='rounded'
-									icon='HeroPaperAirplane'>
-									Send
-								</Button>
-							) : (
-								<Button
-									className='ms-2'
-									icon='HeroMicrophone'
-									aria-label='Speaking'
-								/>
-							)
-						}>
-						<Input
+					<div className='relative flex items-center w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl focus-within:border-indigo-500/80 focus-within:ring-2 focus-within:ring-indigo-500/10 focus-within:shadow-indigo-500/5 transition-all duration-300 p-2 shadow-lg'>
+						{/* Nút cộng tải tệp lên cực đẹp */}
+						<button
+							type='button'
+							aria-label='Tải tệp lên'
+							className='p-2.5 bg-zinc-50 dark:bg-zinc-800/50 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 text-zinc-500 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400 rounded-xl transition-all duration-200 flex items-center justify-center hover:scale-[1.03] active:scale-[0.97] shrink-0 shadow-sm'>
+							<Icon icon='HeroPlus' size='text-xl' />
+						</button>
+
+						{/* Textfield nhập liệu đẹp đẽ, phóng khoáng */}
+						<input
 							id='textField'
 							name='textField'
-							dimension='xl'
-							placeholder='Ask something'
+							placeholder={askGptApiStatus === PENDING ? 'AI đang tạo ảnh... Vui lòng đợi' : 'Mô tả hình ảnh bạn muốn tạo...'}
 							onChange={formik.handleChange}
 							value={formik.values.textField}
 							onKeyDown={handleKeyDown}
+							autoComplete='off'
+							disabled={askGptApiStatus === PENDING}
+							className='flex-1 bg-transparent border-0 outline-none focus:outline-none focus:border-transparent focus:ring-0 text-zinc-850 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 text-sm py-2.5 px-4 leading-relaxed disabled:opacity-60 disabled:cursor-not-allowed'
 						/>
-					</FieldWrap>
+
+						{/* Nút Gửi / Microphone / Dừng phản hồi */}
+						{askGptApiStatus === PENDING ? (
+							<button
+								type='button'
+								aria-label='Dừng phản hồi'
+								onClick={() => {
+									stopGeneratingRef.current = true;
+									setAskGptApiStatus(FAILED);
+								}}
+								className='p-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl shadow-md transition-all duration-200 flex items-center justify-center hover:scale-[1.03] active:scale-[0.97] shrink-0 border border-rose-600/20 animate-pulse'>
+								<Icon icon='HeroStop' size='text-xl' />
+							</button>
+						) : formik.values?.textField ? (
+							<button
+								type='button'
+								onClick={() => sendQuestionOnClick(formik.values?.textField)}
+								className='p-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-650 text-white rounded-xl shadow-md transition-all duration-200 flex items-center justify-center hover:scale-[1.03] active:scale-[0.97] shrink-0 border border-indigo-600/20'>
+								<Icon icon='HeroPaperAirplane' size='text-xl' />
+							</button>
+						) : (
+							<button
+								type='button'
+								aria-label='Ghi âm giọng nói'
+								className='p-2.5 bg-zinc-50 dark:bg-zinc-800/50 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500/30 text-zinc-500 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400 rounded-xl transition-all duration-200 flex items-center justify-center hover:scale-[1.03] active:scale-[0.97] shrink-0 shadow-sm'>
+								<Icon icon='HeroMicrophone' size='text-xl' />
+							</button>
+						)}
+					</div>
 				</AIChatInputContainerCommon>
 			</Container>
 		</PageWrapper>

@@ -34,6 +34,38 @@ interface IChat {
 	content: string;
 }
 
+const cleanContent = (content: string) => {
+	if (!content) return '';
+	try {
+		let clean = content;
+		// Clean up the OpenRouter time prefix if it exists: e.g. "05:00:01.000000, Assistant: "
+		const timePrefixRegex = /^\d{2}:\d{2}:\d{2}\.\d{6},\s*(Assistant|User|System):\s*/i;
+		if (timePrefixRegex.test(clean)) {
+			clean = clean.replace(timePrefixRegex, '');
+		}
+		
+		// If it looks like a JSON array or object, try parsing it
+		const trimmed = clean.trim();
+		if ((trimmed.startsWith('[') && trimmed.endsWith(']')) || (trimmed.startsWith('{') && trimmed.endsWith('}'))) {
+			const parsed = JSON.parse(trimmed);
+			if (Array.isArray(parsed)) {
+				return parsed.map((item: any) => {
+					if (typeof item === 'object' && item !== null) {
+						return item.text || item.content || JSON.stringify(item);
+					}
+					return String(item);
+				}).join('\n');
+			} else if (typeof parsed === 'object' && parsed !== null) {
+				return parsed.text || parsed.content || JSON.stringify(parsed);
+			}
+		}
+		return clean;
+	} catch (e) {
+		// Fallback
+	}
+	return content;
+};
+
 const ChatBotClient = () => {
 	const [listQuestions, setListQuestions] = useState([
 		{
@@ -169,7 +201,7 @@ const ChatBotClient = () => {
 					return (
 						<AIChatItemContainerCommon
 							key={index}
-							content={question?.content}
+							content={cleanContent(question?.content)}
 							userName={question?.role === USER ? 'Bạn' : 'AI'}
 							isAnswer={question?.role === SYSTEM || question?.role === ASSISTANT}
 						/>
