@@ -430,9 +430,35 @@ const ChatPhotoClient = () => {
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                const base64Str = (e.target?.result as string).split(',')[1];
-                setOriginalImageBase64(base64Str);
-                setGeneratedImage(null);
+                const img = new window.Image();
+                img.src = e.target?.result as string;
+                img.onload = () => {
+                    const maxSide = 1920;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxSide || h > maxSide) {
+                        if (w > h) {
+                            h = Math.round(h * (maxSide / w));
+                            w = maxSide;
+                        } else {
+                            w = Math.round(w * (maxSide / h));
+                            h = maxSide;
+                        }
+                    }
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = w;
+                    tempCanvas.height = h;
+                    const ctx = tempCanvas.getContext('2d');
+                    if (ctx) {
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const optimizedBase64 = tempCanvas.toDataURL('image/png').split(',')[1];
+                        setOriginalImageBase64(optimizedBase64);
+                    } else {
+                        const base64Str = (e.target?.result as string).split(',')[1];
+                        setOriginalImageBase64(base64Str);
+                    }
+                    setGeneratedImage(null);
+                };
             };
             reader.readAsDataURL(file);
             loadImageToCanvas(file);
