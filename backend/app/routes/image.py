@@ -156,7 +156,7 @@ async def replace_object(request: ReplaceObjectRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/ai-demos/segment-sam")
-async def segment_sam(request: SegmentSamRequest):
+def segment_sam(request: SegmentSamRequest):
     try:
         mask_b64 = sam_service.segment_by_point(
             image_b64=request.image,
@@ -173,3 +173,4 @@ async def segment_sam(request: SegmentSamRequest):
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
