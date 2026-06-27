@@ -1,5 +1,9 @@
-flask
-flask-cors
+fastapi
+uvicorn
+pydantic
+python-multipart
+jinja2
+ultralytics
 openai
 python-dotenv
 requests

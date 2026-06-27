@@ -1,4 +1,4 @@
-import React, { FC, HTMLAttributes, ReactNode } from 'react';
+import React, { FC, HTMLAttributes, ReactNode, memo } from 'react';
 import classNames from 'classnames';
 import Avatar from '@/components/Avatar';
 import { UserBrainThumb } from '@/assets/images';
@@ -14,7 +14,7 @@ interface IAIChatItemContainerCommonProps extends HTMLAttributes<HTMLDivElement>
 	content?: string;
 }
 
-const AIChatItemContainerCommon: FC<IAIChatItemContainerCommonProps> = (props) => {
+const AIChatItemContainerCommon: FC<IAIChatItemContainerCommonProps> = memo((props) => {
 	const {
 		content,
 		children,
@@ -89,6 +89,8 @@ const AIChatItemContainerCommon: FC<IAIChatItemContainerCommonProps> = (props) =
 
 		</div>
 	);
-};
+});
+
+AIChatItemContainerCommon.displayName = 'AIChatItemContainerCommon';
 
 export default AIChatItemContainerCommon;

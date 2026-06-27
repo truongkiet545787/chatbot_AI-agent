@@ -33,3 +33,8 @@ DOCS.docx
 # Backups
 .git_backup/
 **/.git_backup/
+
+# AI Models & Large Files
+*.pt
+backend/test_input.png
+

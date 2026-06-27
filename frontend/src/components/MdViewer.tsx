@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC, useState } from 'react';
+import React, { FC, useState, memo } from 'react';
 import { Prism } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import ReactMarkdown, { Options } from 'react-markdown';
@@ -13,7 +13,7 @@ interface IMdViewerProps extends Partial<Options> {
 	mdFile: string;
 	className?: string;
 }
-const MdViewer: FC<IMdViewerProps> = (props) => {
+const MdViewer: FC<IMdViewerProps> = memo((props) => {
 	const { mdFile, className: classes } = props;
 
 	const content = mdFile;
@@ -79,6 +79,8 @@ const MdViewer: FC<IMdViewerProps> = (props) => {
 			</pre>
 		</>
 	);
-};
+});
+
+MdViewer.displayName = 'MdViewer';
 
 export default MdViewer;

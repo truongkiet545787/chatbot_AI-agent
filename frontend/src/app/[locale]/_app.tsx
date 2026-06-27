@@ -1,5 +1,19 @@
 'use client';
 
+import axios from 'axios';
+
+if (typeof window !== 'undefined') {
+	axios.interceptors.request.use((config) => {
+		if (config.headers) {
+			(config.headers as any)['X-Pinggy-No-Screen'] = 'true';
+		}
+		return config;
+	}, (error) => {
+		return Promise.reject(error);
+	});
+}
+
+
 import React, { ReactNode } from 'react';
 import useFontSize from '@/hooks/useFontSize';
 import useMounted from '@/hooks/useMounted';

@@ -73,7 +73,7 @@
 				"allowArrowFunction": false,
 				"allowAnonymousClass": false,
 				"allowAnonymousFunction": false,
-				"allowCallExpression": true, // The true value here is for backward compatibility
+				"allowCallExpression": true,
 				"allowLiteral": false,
 				"allowObject": true
 			}
