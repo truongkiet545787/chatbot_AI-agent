@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class SAMService:
     def __init__(self, model_path=None):
         import os
-        self.model_path = model_path or os.getenv('SAM_MODEL_NAME', 'sam2_b.onnx')
+        self.model_path = model_path or os.getenv('SAM_MODEL_NAME', 'sam2_l.onnx')
         self.model = None
 
     def load_model(self):
