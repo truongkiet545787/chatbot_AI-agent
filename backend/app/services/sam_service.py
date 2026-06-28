@@ -11,13 +11,18 @@ logger = logging.getLogger(__name__)
 class SAMService:
     def __init__(self, model_path=None):
         import os
-        self.model_path = model_path or os.getenv('SAM_MODEL_NAME', 'mobile_sam.pt')
+        self.model_path = model_path or os.getenv('SAM_MODEL_NAME', 'sam2_b.onnx')
         self.model = None
 
     def load_model(self):
         if self.model is None:
+            import os
             logger.info(f"Loading SAM model from {self.model_path}...")
-            # If mobile_sam.pt is not present, ultralytics will automatically download it.
+            if self.model_path.endswith('.onnx') and not os.path.exists(self.model_path):
+                pt_path = self.model_path.replace('.onnx', '.pt')
+                logger.info(f"ONNX model file '{self.model_path}' not found. Downloading {pt_path} and exporting to ONNX...")
+                pt_model = SAM(pt_path)
+                pt_model.export(format="onnx")
             self.model = SAM(self.model_path)
             logger.info("SAM model loaded successfully.")
         return self.model
