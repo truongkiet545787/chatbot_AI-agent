@@ -4,7 +4,7 @@ export const PROTONX_LOGO = {
 };
 
 export const getHOST = () => {
-	return process.env.NEXT_PUBLIC_API_URL || 'https://chatbot-ai-agent-p9ab.onrender.com';
+	return process.env.NEXT_PUBLIC_API_URL || 'https://truongkiet545787-kinal-ai-backend.hf.space';
 };
 
 export const HOST = getHOST();
