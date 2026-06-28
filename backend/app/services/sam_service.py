@@ -43,33 +43,14 @@ class SAMService:
         x_orig = max(0, min(x_orig, img_width - 1))
         y_orig = max(0, min(y_orig, img_height - 1))
 
-        # Tối ưu hóa cho môi trường giới hạn RAM (như Render Free 512MB RAM):
-        # Tự động nén kích thước ảnh xuống cạnh tối đa 600px trước khi đưa vào PyTorch
-        max_side = 600
-        img_for_model = img
-        x_model, y_model = x_orig, y_orig
-        
-        if max(img_width, img_height) > max_side:
-            if img_width > img_height:
-                new_w = max_side
-                new_h = int(img_height * (max_side / img_width))
-            else:
-                new_h = max_side
-                new_w = int(img_width * (max_side / img_height))
-                
-            img_for_model = img.resize((new_w, new_h), Image.Resampling.BILINEAR)
-            x_model = x_orig * (new_w / img_width)
-            y_model = y_orig * (new_h / img_height)
-            print(f"[SAM RAM Optimization] Resized from {img_width}x{img_height} to {new_w}x{new_h} to fit inside 512MB RAM limit.")
-
         # Determine device
         device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"[SAM] Click coordinate on display: ({x}, {y}) on size ({display_width}x{display_height})")
-        print(f"[SAM] Scaled coordinate for model: ({x_model}, {y_model})")
+        print(f"[SAM] Scaled coordinate for model: ({x_orig}, {y_orig})")
         print(f"[SAM] Running inference on device: {device}")
 
-        # Run inference
-        results = model.predict(img_for_model, points=[[x_model, y_model]], labels=[1], device=device, verbose=False)
+        # Run inference on original image
+        results = model.predict(img, points=[[x_orig, y_orig]], labels=[1], device=device, verbose=False)
         result = results[0]
 
         if result.masks is None:
@@ -85,10 +66,6 @@ class SAMService:
         rgba_mask[mask_np == 0] = [0, 0, 0, 0]
         
         mask_img = Image.fromarray(rgba_mask, mode='RGBA')
-
-        # Nếu đã resize lúc đưa vào model, resize mặt nạ kết quả về kích thước ảnh gốc ban đầu
-        if (w, h) != (img_width, img_height):
-            mask_img = mask_img.resize((img_width, img_height), Image.Resampling.NEAREST)
 
         # Save to PNG and return as base64
         buffered = BytesIO()
