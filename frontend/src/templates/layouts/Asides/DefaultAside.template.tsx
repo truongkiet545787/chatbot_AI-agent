@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { appPages, componentsPages } from '@/config/pages.config';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useParams } from 'next/navigation';
+import Icon from '../../../components/icon/Icon';
 import Aside, { AsideBody, AsideFooter, AsideHead } from '../../../components/layouts/Aside/Aside';
 import LogoAndAsideTogglePart from './_parts/LogoAndAsideToggle.part';
 import DarkModeSwitcherPart from './_parts/DarkModeSwitcher.part';
@@ -18,6 +19,34 @@ import usersDb from '../../../mocks/db/users.db';
 
 const DefaultAsideTemplate = () => {
 	const router = useRouter();
+	const pathname = usePathname();
+	const params = useParams();
+	const locale = params?.locale || 'vi';
+
+	const [chatSessions, setChatSessions] = useState<any[]>([]);
+	const [isHistoryExpanded, setIsHistoryExpanded] = useState<boolean>(false);
+
+	const loadSessions = () => {
+		if (typeof window !== 'undefined') {
+			const saved = localStorage.getItem('kinal_chat_sessions');
+			if (saved) {
+				try {
+					setChatSessions(JSON.parse(saved));
+				} catch (e) {}
+			} else {
+				setChatSessions([]);
+			}
+		}
+	};
+
+	useEffect(() => {
+		loadSessions();
+		window.addEventListener('kinal_sessions_updated', loadSessions);
+		return () => {
+			window.removeEventListener('kinal_sessions_updated', loadSessions);
+		};
+	}, []);
+
 
 	return (
 		<Aside>
@@ -111,14 +140,49 @@ const DefaultAsideTemplate = () => {
 									?.speechRecognitionPage}
 							/>
 							<NavItem
-								{...appPages?.aiAppPages?.subPages?.chatPages?.subPages?.ragPage}
-							/>
-							<NavItem
 								{...appPages?.aiAppPages?.subPages?.chatPages?.subPages
 									?.chatBotPage}
 							/>
+							{/* Thêm mục con "Lịch sử trò chuyện" (Có thể thu gọn/mở rộng) */}
+							{pathname.includes('/ai/chat/chat-bot') && chatSessions.length > 0 && (
+								<div className='pl-8 pr-2 py-1 space-y-1 ml-6 my-1'>
+									<div
+										onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
+										className='flex items-center justify-between py-1.5 px-2.5 rounded-lg cursor-pointer text-[10px] font-bold text-zinc-400 dark:text-zinc-500 hover:text-zinc-650 dark:hover:text-zinc-305 uppercase tracking-wider select-none hover:bg-zinc-100/50 dark:hover:bg-zinc-800/20'
+									>
+										<span>Lịch sử trò chuyện</span>
+										<Icon
+											icon={isHistoryExpanded ? 'HeroChevronDown' : 'HeroChevronRight'}
+											size='text-[10px]'
+											className='opacity-70 transition-transform duration-200'
+										/>
+									</div>
+									
+									{isHistoryExpanded && (
+										<div className='space-y-1 mt-1 pl-1 max-h-40 overflow-y-auto no-scrollbar border-l border-zinc-200/50 dark:border-zinc-800/40'>
+											{chatSessions.map((s: any) => {
+												const isActive = typeof window !== 'undefined' && window.location.search.includes(s.id);
+												return (
+													<div
+														key={s.id}
+														onClick={() => router.push(`/${locale}/ai/chat/chat-bot?sessionId=${s.id}`)}
+														className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs transition-all duration-150 ${
+															isActive
+																? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-medium'
+																: 'hover:bg-zinc-100 dark:hover:bg-zinc-800/40 text-zinc-500 dark:text-zinc-400'
+														}`}
+													>
+														<span className='truncate max-w-[130px]'>{s.title}</span>
+													</div>
+												);
+											})}
+										</div>
+									)}
+								</div>
+							)}
 						</NavCollapse>
 					</NavCollapse>
+
 
 					{/* <NavCollapse
 						text={appPages.crmAppPages.text}

@@ -149,7 +149,7 @@ const AiDashboardClient = () => {
 					{/* Card 2: Chat Bot RAG */}
 					<div className='col-span-12 md:col-span-6 lg:col-span-4'>
 						<Link
-							href={`${appPages?.aiAppPages?.subPages?.chatPages?.subPages?.ragPage?.to}`}>
+							href={`${appPages?.aiAppPages?.subPages?.chatPages?.subPages?.chatBotPage?.to}`}>
 							<div className='group relative rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 p-6 shadow-sm hover:shadow-lg hover:border-indigo-500/30 dark:hover:border-indigo-500/30 transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden'>
 								<div className='absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
 								<div className='flex items-center gap-4 relative z-10'>
@@ -161,7 +161,7 @@ const AiDashboardClient = () => {
 											Chatbot RAG
 										</div>
 										<div className='text-xs text-zinc-400 dark:text-zinc-500 mt-1'>
-											Truy vấn tài liệu riêng
+											Hỏi đáp & Tra cứu tài liệu
 										</div>
 									</div>
 								</div>

@@ -11,3 +11,11 @@ httpx
 gunicorn
 onnx
 onnxruntime
+langchain
+langchain-openai
+pypdf
+chromadb
+sentence-transformers
+langchain-community
+langchain-huggingface
+cryptography
