@@ -20,12 +20,14 @@ backend/
 ├── app/
 │   ├── routes/
 │   │   ├── chat.py             # Router xử lý chat thường và chat RAG tài liệu
-│   │   └── image.py            # Router xử lý tạo ảnh, sketch, inpaint và SAM
+│   │   ├── image.py            # Router xử lý tạo ảnh, sketch, inpaint và SAM
+│   │   └── video_translation.py# Router xử lý lồng tiếng và dịch video (Youtube/Local)
 │   ├── services/
 │   │   ├── openai_service.py   # Tích hợp LLM qua LangChain & OpenRouter
 │   │   ├── rag_service.py      # Core RAG: Đọc file, Embeddings, Chroma DB, Map-Reduce
 │   │   ├── sam_service.py      # Phân đoạn đối tượng SAM (ONNX Runtime / Ultralytics)
-│   │   └── stability_service.py# Tích hợp API tạo ảnh & chỉnh sửa của Stability AI
+│   │   ├── stability_service.py# Tích hợp API tạo ảnh & chỉnh sửa của Stability AI
+│   │   └── video_translation_service.py # Xử lý trích xuất âm thanh, STT, Dịch thuật LLM & TTS
 │   └── templates/
 │       └── index.html          # Trang UI demo cơ bản đi kèm backend
 ├── Dockerfile                  # Cấu hình container chạy production
@@ -74,6 +76,16 @@ backend/
   * Tích hợp API **Stable Image Edit Inpaint** của Stability AI.
   * **Ràng buộc kích thước API**: Tự động kiểm tra và resize ảnh/mask xuống dưới ngưỡng `2048px` nếu ảnh đầu vào quá lớn (tránh lỗi giới hạn 9 megapixel của API Stability). Sau khi nhận ảnh đã inpaint thành công, thực hiện **upscale ngược trở lại** kích thước gốc ban đầu để giữ độ phân giải ảnh của người dùng.
 
+### 5. Dịch Thuật & Lồng Tiếng Video (Video Translation & Dubbing)
+* **Trích xuất âm thanh**: Tải video/âm thanh YouTube thông qua thư viện `yt-dlp` được tối ưu hóa bản mới nhất, sau đó trích xuất kênh tiếng bằng `FFmpeg`.
+* **Nhận diện giọng nói (Speech-to-Text)**: Sử dụng mô hình **Whisper** thông qua API cực nhanh của **Groq Cloud** để chuyển đổi giọng nói thành transcript kèm mốc thời gian (timestamps) chính xác cho từng segment.
+* **Dịch thuật bằng LLM**: Sử dụng mô hình ngôn ngữ lớn hàng đầu **Llama 3.3 70B** của Groq (hoặc dự phòng qua Gemini/OpenRouter) để dịch văn bản sang tiếng Việt. Prompt hệ thống ràng buộc chặt chẽ để đảm bảo văn bản dịch ngắn gọn, khớp với độ dài câu nói gốc trong tiếng Anh.
+* **Tổng hợp giọng nói (Text-to-Speech)**: Sử dụng thư viện **Edge-TTS** mượn giọng thuyết minh từ Microsoft (mặc định giọng nữ Hoài Mỹ, giọng nam Minh Minh) hoàn toàn miễn phí.
+* **Kỹ thuật chống chặn tần suất (Anti-Rate Limit)**: Tự động chèn khoảng chờ nghỉ (0.5 giây) giữa các câu và triển khai cơ chế **Auto-Retry (thử lại tự động)** tối đa 3 lần với khoảng cách 1.5 giây để tránh lỗi kết nối `No audio was received` của Microsoft.
+* **Trộn âm nền (Audio Ducking)**: Không xóa hoàn toàn nhạc nền video gốc, backend tự động giảm âm lượng nhạc nền/âm thanh gốc xuống mức nhỏ vừa phải (giảm 20dB) bằng thư viện `pydub`, sau đó đè giọng lồng tiếng Việt của AI lên trên, tạo cảm giác thuyết minh cực kỳ chuyên nghiệp.
+* **Xem trước (Preview) thông minh**: Frontend nhúng trực tiếp `iframe` của YouTube và tắt tiếng của player, đồng thời phát luồng âm thanh tiếng Việt song song ở client nhằm tối ưu hóa băng thông của máy chủ.
+* **Bẫy lỗi chặn nhúng (Embed Error Catching)**: Tự động bắt mã lỗi `101`/`150` từ YouTube Iframe API nếu video bị chủ sở hữu chặn nhúng và hiển thị thông báo chuyển đổi cho phép tải trực tiếp video lồng tiếng thay vì hiển thị màn hình đen.
+
 ---
 
 ## ⚙️ Hướng Dẫn Cấu Hình Môi Trường (`.env`)
@@ -95,6 +107,10 @@ SAM_MODEL_NAME=sam2_l.pt
 
 # Tên mô hình Embedding tiếng Việt dùng cho RAG
 RAG_EMBEDDING_MODEL=keepitreal/vietnamese-sbert
+
+# API Key cho tính năng lồng tiếng (Ưu tiên Groq cực nhanh & free)
+GROQ_API_KEY=your_groq_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here (Tùy chọn fallback)
 ```
 
 ---

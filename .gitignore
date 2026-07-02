@@ -41,3 +41,7 @@ backend/test_input.png
 # Generated static assets
 backend/static/
 
+# Other repos
+phamacy/
+
+
