@@ -38,3 +38,6 @@ DOCS.docx
 *.pt
 backend/test_input.png
 
+# Generated static assets
+backend/static/
+

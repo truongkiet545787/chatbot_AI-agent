@@ -136,6 +136,9 @@ const DefaultAsideTemplate = () => {
 								{...appPages.aiAppPages.subPages.chatPages.subPages.audioPage}
 							/>
 							<NavItem
+								{...appPages.aiAppPages.subPages.chatPages.subPages.videoPage}
+							/>
+							<NavItem
 								{...appPages?.aiAppPages?.subPages?.chatPages?.subPages
 									?.speechRecognitionPage}
 							/>

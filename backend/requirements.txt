@@ -19,3 +19,10 @@ sentence-transformers
 langchain-community
 langchain-huggingface
 cryptography
+edge-tts
+pydub
+yt-dlp
+static-ffmpeg
+audioop-lts; python_version >= '3.13'
+
+
