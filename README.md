@@ -46,7 +46,13 @@ backend/
 * **Trích xuất tài liệu (Document Parsing)**:
   * **PDF**: Trích xuất text thô qua thư viện `pypdf`.
   * **DOCX (Word)**: Sử dụng `python-docx` với thuật toán tự động duyệt cấu trúc phần thân (Paragraphs & Tables) để chuyển đổi các bảng biểu trong file Word thành **Markdown Table**, giúp LLM dễ dàng hiểu cấu trúc dữ liệu bảng.
-* **Cắt phân đoạn (Text Splitting)**: Sử dụng `RecursiveCharacterTextSplitter` phân mảnh với `chunk_size=800` ký tự và `chunk_overlap=150` ký tự để giữ nguyên tính toàn vẹn của thông tin.
+* **Cơ chế phân đoạn Parent-Child (Parent-Child Text Splitting)**:
+  * Phân mảnh tài liệu thành các **Parent Chunks** lớn (`chunk_size=2000`, `chunk_overlap=250`) chứa trọn vẹn ngữ cảnh của từng phần tài liệu.
+  * Phân mảnh nhỏ hơn thành các **Child Chunks** (`chunk_size=400`, `chunk_overlap=50`) dùng để mã hóa vector và tìm kiếm tương đồng (Similarity Search).
+  * Khi truy vấn, mô hình sẽ tìm kiếm dựa trên các Child Chunks có độ khớp cao nhất, nhưng sau đó **truy hồi Parent Chunk tương ứng** để chuyển cho LLM, giúp vừa đảm bảo độ chính xác vừa cung cấp ngữ cảnh đầy đủ nhất.
+* **Tính năng hỗ trợ học tập tương tác (Educational Tools)**:
+  * **Tạo Quiz tự động**: Phân tích tài liệu và tự động sinh câu hỏi trắc nghiệm khách quan (gồm 4 lựa chọn A, B, C, D kèm theo lời giải thích chi tiết đáp án đúng) định dạng JSON.
+  * **Tạo Flashcard học nhanh**: Tự động trích xuất các thuật ngữ, khái niệm cốt lõi trong tài liệu để tạo bộ 6 thẻ học nhanh (gồm mặt trước Front và mặt sau Back) hỗ trợ ghi nhớ kiến thức.
 * **Mô hình Vector & Cơ sở dữ liệu**:
   * Mã hóa vector sử dụng mô hình tiếng Việt chuyên sâu **`keepitreal/vietnamese-sbert`** trên Hugging Face thông qua `HuggingFaceEmbeddings` chạy trực tiếp trên CPU.
   * Vector Store: Sử dụng cơ sở dữ liệu **Chroma DB** (chế độ in-memory) lưu trữ phân vùng theo từng phiên làm việc của người dùng.
