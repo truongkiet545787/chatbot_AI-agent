@@ -7,6 +7,7 @@ import Container from '@/components/layouts/Container/Container';
 import Button from '@/components/ui/Button';
 import Icon from '@/components/icon/Icon';
 import Input from '@/components/form/Input';
+import LoaderDotsCommon from '@/components/LoaderDots.common';
 
 interface TaskStatusResponse {
 	status: string;
@@ -22,7 +23,7 @@ const ChatVideoClient = () => {
 	// Trạng thái input
 	const [videoFile, setVideoFile] = useState<File | null>(null);
 	const [videoUrl, setVideoUrl] = useState<string>('');
-	const [voice, setVoice] = useState<string>('vi-VN-HoaiMyNeural');
+	const [voice, setVoice] = useState<string>('diem_trinh');
 	const [originalVolume, setOriginalVolume] = useState<number>(10); // Âm lượng gốc (mặc định 10%)
 	
 	// Trạng thái xử lý
@@ -37,6 +38,9 @@ const ChatVideoClient = () => {
 	const [srtFilename, setSrtFilename] = useState<string>('');
 	const [segments, setSegments] = useState<any[]>([]);
 	const [currentTime, setCurrentTime] = useState<number>(0);
+	
+	// Trạng thái cập nhật phụ đề & lồng tiếng
+	const [isRegenerating, setIsRegenerating] = useState<boolean>(false);
 	
 	// Đường dẫn phát video cục bộ ở Client
 	const [localVideoSrc, setLocalVideoSrc] = useState<string>('');
@@ -135,7 +139,6 @@ const ChatVideoClient = () => {
 							}
 						},
 						onError: (event: any) => {
-							// 101, 150: Video owner does not allow embedding
 							if (event.data === 101 || event.data === 150) {
 								setEmbedError(true);
 							}
@@ -331,7 +334,6 @@ const ChatVideoClient = () => {
 					setSrtFilename(data.srt_filename || '');
 					setSegments(data.segments || []);
 					
-					// Nếu máy chủ trả về URL video gốc (YouTube hoặc link mạng), ta gán thẳng cho localVideoSrc
 					if (data.original_video_url) {
 						setLocalVideoSrc(data.original_video_url);
 					} else if (videoUrl && !videoFile) {
@@ -394,6 +396,60 @@ const ChatVideoClient = () => {
 	const getSubtitleDownloadUrl = () => {
 		const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 		return `${apiBase}/static/video_translation/${srtFilename}`;
+	};
+
+	// Xử lý chỉnh sửa văn bản từng phân đoạn
+	const handleSegmentTextChange = (index: number, newText: string) => {
+		setSegments((prev) => {
+			const updated = [...prev];
+			updated[index] = { ...updated[index], translated_text: newText };
+			return updated;
+		});
+	};
+
+	// Gọi API để cập nhật giọng lồng tiếng theo câu thoại đã sửa
+	const handleUpdateDubbing = async () => {
+		setIsRegenerating(true);
+		try {
+			const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+			const response = await fetch(`${apiBase}/api/video/regenerate-dub`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					task_id: taskId,
+					voice: voice,
+					segments: segments,
+				}),
+			});
+
+			if (!response.ok) {
+				const errData = await response.json();
+				throw new Error(errData.detail || 'Lỗi cập nhật lồng tiếng');
+			}
+
+			const data = await response.json();
+			// Cập nhật lại đường dẫn audio lồng tiếng và phụ đề vtt mới
+			setDubbedAudioUrl(`${apiBase}${data.audio_url}`);
+			setVttUrl(`${apiBase}${data.vtt_url}`);
+			setSrtFilename(data.srt_filename || '');
+			setSegments(data.segments);
+			
+			// Buộc nạp lại file audio và phát lại đồng bộ
+			if (audioPlayerRef.current) {
+				audioPlayerRef.current.load();
+				if (videoPlayerRef.current && !videoPlayerRef.current.paused) {
+					audioPlayerRef.current.play().catch(() => {});
+				}
+			}
+			
+			alert('Cập nhật giọng thuyết minh & phụ đề thành công!');
+		} catch (err: any) {
+			alert(`Không thể cập nhật: ${err.message}`);
+		} finally {
+			setIsRegenerating(false);
+		}
 	};
 
 	const activeSegment = segments.find(seg => currentTime >= seg.start && currentTime <= seg.end);
@@ -488,7 +544,7 @@ const ChatVideoClient = () => {
 						<div className='rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950'>
 							<h3 className='mb-4 text-lg font-semibold flex items-center gap-2'>
 								<Icon icon='HeroAdjustmentsHorizontal' className='h-5 w-5 text-indigo-500' />
-								Cấu Hình Dịch & Lồng Tiếng
+								Cấu Hìn Dịch & Lồng Tiếng
 							</h3>
 							
 							<div className='flex flex-col gap-5'>
@@ -502,8 +558,12 @@ const ChatVideoClient = () => {
 										value={voice}
 										onChange={(e) => setVoice(e.target.value)}
 										className='w-full rounded-lg border border-zinc-200 bg-zinc-50 p-2.5 text-sm text-zinc-900 focus:border-indigo-500 focus:ring-indigo-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100'>
-										<option value='vi-VN-HoaiMyNeural'>Hoài My (Nữ - Giọng miền Nam ấm áp)</option>
-										<option value='vi-VN-NamMinhNeural'>Nam Minh (Nam - Giọng miền Bắc rõ chữ)</option>
+										<option value='diem_trinh'>Diễm Trinh (Nữ - Truyền cảm)</option>
+										<option value='hung_thinh'>Hùng Thịnh (Nam - Ấm áp)</option>
+										<option value='mai_linh'>Mai Linh (Nữ - Trong trẻo)</option>
+										<option value='manh_dung'>Mạnh Dũng (Nam - Review phim)</option>
+										<option value='ngoc_huyen'>Ngọc Huyền (Nữ - Kể chuyện)</option>
+										<option value='tuan_ngoc'>Tuấn Ngọc (Nam - Bản tin)</option>
 									</select>
 								</div>
 
@@ -545,6 +605,7 @@ const ChatVideoClient = () => {
 											variant='outline'
 											color='zinc'
 											className='w-full py-2.5 flex justify-center items-center gap-2'
+											disabled={isRegenerating}
 											onClick={handleReset}>
 											<Icon icon='HeroArrowPath' className='h-5 w-5' />
 											Reset / Dịch video mới
@@ -553,6 +614,64 @@ const ChatVideoClient = () => {
 								</div>
 							</div>
 						</div>
+
+						{/* Card Bảng Chỉnh Sửa Phụ Đề & Thuyết Minh (Chỉ hiển thị khi đã hoàn thành) */}
+						{status === 'completed' && segments.length > 0 && (
+							<div className='rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 flex flex-col'>
+								<h3 className='mb-4 text-lg font-semibold flex items-center gap-2'>
+									<Icon icon='HeroLanguage' className='h-5 w-5 text-indigo-500' />
+									Bảng Chỉnh Sửa Câu Thoại
+								</h3>
+								
+								<div className='flex flex-col gap-4 max-h-[350px] overflow-y-auto pr-1 no-scrollbar'>
+									{segments.map((seg, idx) => (
+										<div key={idx} className='p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col gap-1'>
+											<div className='flex justify-between items-center text-[10px] text-zinc-400 font-semibold'>
+												<span>Câu {idx + 1} ({seg.start.toFixed(1)}s - {seg.end.toFixed(1)}s)</span>
+												<button
+													onClick={() => {
+														if (ytPlayerRef.current && ytPlayerRef.current.seekTo) {
+															ytPlayerRef.current.seekTo(seg.start, true);
+														} else if (videoPlayerRef.current) {
+															videoPlayerRef.current.currentTime = seg.start;
+														}
+													}}
+													className='flex items-center gap-1 px-1.5 py-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-indigo-500 rounded transition-colors'
+													title='Phát thử đoạn video này'>
+													<Icon icon='HeroPlay' size='text-[10px]' />
+													<span>Nghe gốc</span>
+												</button>
+											</div>
+											<input
+												type='text'
+												value={seg.translated_text || ''}
+												onChange={(e) => handleSegmentTextChange(idx, e.target.value)}
+												className='w-full rounded-md border border-zinc-250 bg-white dark:bg-zinc-950 p-2 text-xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-zinc-800 dark:text-zinc-100 mt-1'
+											/>
+										</div>
+									))}
+								</div>
+								
+								<Button
+									variant='solid'
+									color='indigo'
+									className='w-full py-2.5 flex justify-center items-center gap-2 mt-4'
+									disabled={isRegenerating}
+									onClick={handleUpdateDubbing}>
+									{isRegenerating ? (
+										<>
+											<LoaderDotsCommon />
+											<span className='ml-2'>Đang xử lý giọng thuyết minh mới...</span>
+										</>
+									) : (
+										<>
+											<Icon icon='HeroCheck' className='h-5 w-5' />
+											<span>Cập nhật giọng thuyết minh</span>
+										</>
+									)}
+								</Button>
+							</div>
+						)}
 					</div>
 
 					{/* CỘT PHẢI - TRÌNH PHÁT VIDEO DUAL-PLAYER */}

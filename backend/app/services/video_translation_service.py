@@ -8,7 +8,6 @@ import logging
 import time
 from typing import Dict, Any, List
 from openai import OpenAI
-import edge_tts
 from pydub import AudioSegment
 
 logger = logging.getLogger(__name__)
@@ -107,11 +106,33 @@ class VideoTranslationService:
         
         raise ValueError("Vui lòng cấu hình GEMINI_API_KEY, GROQ_API_KEY hoặc OPENAI_API_KEY trong file .env để kết nối trực tiếp với LLM!")
 
+    def _get_kokoro_instance(self, voice: str):
+        if not hasattr(self, "kokoro_instances"):
+            self.kokoro_instances = {}
+        if voice not in self.kokoro_instances:
+            from kokoro_vietnamese import KokoroVietnamese
+            self.kokoro_instances[voice] = KokoroVietnamese(voice=voice, device="cpu")
+        return self.kokoro_instances[voice]
+
+    def _generate_kokoro_file(self, text: str, voice: str, output_path: str):
+        import soundfile as sf
+        kokoro = self._get_kokoro_instance(voice)
+        audio, _ = kokoro.synthesize(text)
+        sf.write(output_path, audio, 24000)
+
     async def run_tts_segment(self, text: str, voice: str, output_path: str):
-        """Sinh giọng thuyết minh tiếng Việt cho một câu thông qua edge-tts với giới hạn thời gian (Timeout)."""
-        communicate = edge_tts.Communicate(text, voice)
-        # Giới hạn tối đa 7 giây để tránh treo mạng khi kết nối Microsoft Edge TTS
-        await asyncio.wait_for(communicate.save(output_path), timeout=7.0)
+        """Sinh giọng thuyết minh tiếng Việt cho một câu thông qua mô hình offline Kokoro-Vietnamese."""
+        # Nhận trực tiếp giọng đọc Kokoro. Nếu không khớp, ánh xạ ngược từ giọng cũ để giữ an toàn.
+        from kokoro_vietnamese import VOICES
+        kokoro_voice = voice or "diem_trinh"
+        if kokoro_voice not in VOICES:
+            if "nam" in kokoro_voice.lower() or "minh" in kokoro_voice.lower():
+                kokoro_voice = "manh_dung"
+            else:
+                kokoro_voice = "diem_trinh"
+        
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(None, self._generate_kokoro_file, text, kokoro_voice, output_path)
 
     def translate_segments_llm(self, segments: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Sử dụng LLM (Gemini 1.5 Flash) để dịch danh sách các câu sang tiếng Việt theo từng nhóm nhỏ (chunk)."""
@@ -136,7 +157,7 @@ class VideoTranslationService:
             '[{"id": 0, "text": "Xin chào, tên tôi là John."}, {"id": 1, "text": "Hôm nay chúng ta sẽ học tiếng Anh."}]'
         )
 
-        chunk_size = 50
+        chunk_size = 25
         total_segments = len(segments)
         
         for i in range(0, total_segments, chunk_size):
@@ -162,7 +183,8 @@ class VideoTranslationService:
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": json.dumps(chunk_input, ensure_ascii=False)}
                     ],
-                    temperature=0.3
+                    temperature=0.3,
+                    max_tokens=2048
                 )
                 
                 content = response.choices[0].message.content.strip()
@@ -178,7 +200,7 @@ class VideoTranslationService:
                 
                 try:
                     translated_data = json.loads(content)
-                    translated_dict = {item["id"]: item["text"] for item in translated_data}
+                    translated_dict = {int(item["id"]): item["text"] for item in translated_data if "id" in item and "text" in item}
                     
                     # Cập nhật kết quả dịch
                     for item in chunk_input:
@@ -200,7 +222,7 @@ class VideoTranslationService:
         return segments
 
     async def generate_all_tts(self, segments: List[Dict[str, Any]], voice: str, temp_dir: str) -> Dict[int, str]:
-        """Sinh giọng thuyết minh tuần tự cho tất cả các segment, có cơ chế Retry để tránh lỗi Rate Limit của Edge-TTS."""
+        """Sinh giọng thuyết minh tuần tự cho tất cả các segment bằng mô hình offline Kokoro-Vietnamese."""
         tts_files = {}
         consecutive_failures = 0
         
@@ -212,7 +234,7 @@ class VideoTranslationService:
             
             seg_audio_path = os.path.join(temp_dir, f"seg_{idx}.mp3")
             
-            # Thử gọi Edge-TTS tối đa 3 lần cho mỗi câu
+            # Thử gọi TTS tối đa 3 lần cho mỗi câu
             max_retries = 3
             success = False
             
@@ -225,8 +247,9 @@ class VideoTranslationService:
                         success = True
                         break  # Thoát vòng lặp retry nếu thành công
                 except Exception as e:
-                    print(f"[VIDEO_DUBBING] Thử lại lần {attempt + 1}/{max_retries} sinh TTS câu {idx} bị lỗi: {e}")
-                    await asyncio.sleep(1.5)  # Chờ 1.5s trước khi thử lại
+                    backoff_time = 1.0 * (attempt + 1)
+                    print(f"[VIDEO_DUBBING] Thử lại lần {attempt + 1}/{max_retries} sinh TTS câu {idx} bị lỗi: {e}. Chờ {backoff_time}s...")
+                    await asyncio.sleep(backoff_time)
             
             if not success:
                 consecutive_failures += 1
@@ -235,14 +258,13 @@ class VideoTranslationService:
                 
                 if consecutive_failures >= 5:
                     print("[VIDEO_DUBBING] Phát hiện 5 câu liên tiếp bị lỗi TTS. Dừng quá trình lồng tiếng.")
-                    raise RuntimeError("Kết nối dịch vụ Edge-TTS bị gián đoạn liên tục. Vui lòng kiểm tra lại mạng.")
+                    raise RuntimeError("Lỗi tạo giọng đọc offline liên tiếp. Vui lòng kiểm tra lại cấu hình mô hình.")
             
-            # Nghỉ 0.5s giữa mỗi câu để tránh bị Microsoft đánh dấu là spam (Rate Limit)
-            await asyncio.sleep(0.5)
-            
+            # Mô hình chạy offline cục bộ nên không cần sleep để tránh Rate Limit
+            await asyncio.sleep(0.01)
         return tts_files
 
-    def process_translation(self, video_path: str, voice: str, output_audio_dir: str) -> Dict[str, Any]:
+    def process_translation(self, video_path: str, voice: str, output_audio_dir: str, orig_wav_path: str = None) -> Dict[str, Any]:
         """
         Quy trình xử lý dịch video:
         1. Lấy thời lượng video.
@@ -266,22 +288,45 @@ class VideoTranslationService:
             print("[VIDEO_DUBBING] 2. Đang tách âm thanh WAV bằng FFmpeg...")
             extract_audio(video_path, temp_audio_path)
             print("[VIDEO_DUBBING] Tách âm thanh thành công.")
+            
+            if orig_wav_path:
+                import shutil
+                shutil.copyfile(temp_audio_path, orig_wav_path)
+                print(f"[VIDEO_DUBBING] Đã lưu bản sao WAV gốc vào: {orig_wav_path}")
 
             # 3. Chạy Whisper
             print(f"[VIDEO_DUBBING] 3. Đang gọi Whisper STT ({'Groq' if self.groq_api_key else 'OpenAI'})...")
             client, model, is_groq = self._get_whisper_client()
-            
             with open(temp_audio_path, "rb") as audio_file:
                 transcription = client.audio.transcriptions.create(
                     file=audio_file,
                     model=model,
-                    response_format="verbose_json"
+                    response_format="verbose_json",
+                    language="en",
+                    temperature=0.0
                 )
             
             # Convert response sang dictionary
             data = transcription.model_dump() if hasattr(transcription, "model_dump") else transcription
             segments = data.get("segments", [])
-            print(f"[VIDEO_DUBBING] Nhận diện giọng nói thành công ({len(segments)} segments).")
+            
+            # Lọc bỏ các đoạn nghi ngờ ảo giác hoặc không có giọng nói thực tế (no_speech_prob > 0.6)
+            filtered_segments = []
+            for seg in segments:
+                no_speech_prob = seg.get("no_speech_prob", 0.0)
+                avg_logprob = seg.get("avg_logprob", 0.0)
+                # Bỏ qua nếu xác suất không thoại cao (> 0.6) hoặc chất lượng nhận dạng quá thấp (avg_logprob < -1.0)
+                if no_speech_prob > 0.6 or avg_logprob < -1.0:
+                    print(f"[VIDEO_DUBBING] Bỏ qua đoạn nghi ảo giác (no_speech_prob={no_speech_prob:.2f}, avg_logprob={avg_logprob:.2f}): '{seg.get('text', '')}'")
+                    continue
+                filtered_segments.append(seg)
+            segments = filtered_segments
+            
+            # Đánh lại ID tăng dần từ 0 cho các câu còn lại
+            for idx, seg in enumerate(segments):
+                seg["id"] = idx
+                
+            print(f"[VIDEO_DUBBING] Nhận diện giọng nói thành công (Sau lọc còn {len(segments)} segments).")
 
             if not segments:
                 logger.warning("No speech segments detected in the video.")

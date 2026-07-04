@@ -4,12 +4,14 @@ import logging
 import shutil
 import tempfile
 import subprocess
-from typing import Optional, Dict, Any
+import time
+from typing import Optional, Dict, Any, List
+from pydantic import BaseModel
 from fastapi import APIRouter, File, UploadFile, Form, BackgroundTasks, HTTPException, status
 from fastapi.responses import FileResponse
 import httpx
 import yt_dlp
-from app.services.video_translation_service import VideoTranslationService
+from app.services.video_translation_service import VideoTranslationService, format_time_srt, format_time_vtt
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -36,6 +38,7 @@ def download_youtube_audio(url: str, output_path: str):
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': output_path.replace('.wav', ''), # yt-dlp tự thêm extension
+        'noplaylist': True,  # Bỏ qua playlist, chỉ tải video đơn lẻ
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'wav',
@@ -67,6 +70,7 @@ def download_youtube_video(url: str, output_path: str):
     ydl_opts = {
         'format': 'best[height<=480][ext=mp4]/best[ext=mp4]/best',
         'outtmpl': output_path,
+        'noplaylist': True,  # Bỏ qua playlist, chỉ tải video đơn lẻ
         'quiet': True,
         'no_warnings': True
     }
@@ -102,12 +106,22 @@ def run_translation_background(task_id: str, video_source_path: str, voice: str,
                 extract_audio_from_url(original_url, temp_audio_wav)
                 
             print(f"[VIDEO_DUBBING] Đã có file âm thanh gốc. Bắt đầu dịch thuật...")
-            # Gọi dịch thuật trực tiếp trên file âm thanh gốc
-            result = translation_service.process_translation(temp_audio_wav, voice, OUTPUT_DIR)
+            # Gọi dịch thuật trực tiếp trên file âm thanh gốc và lưu bản sao WAV gốc
+            result = translation_service.process_translation(
+                temp_audio_wav, 
+                voice, 
+                OUTPUT_DIR, 
+                orig_wav_path=os.path.join(OUTPUT_DIR, f"orig_{task_id}.wav")
+            )
         else:
             # Xử lý video upload offline
             print(f"[VIDEO_DUBBING] Bắt đầu xử lý file video upload: {video_source_path}")
-            result = translation_service.process_translation(video_source_path, voice, OUTPUT_DIR)
+            result = translation_service.process_translation(
+                video_source_path, 
+                voice, 
+                OUTPUT_DIR, 
+                orig_wav_path=os.path.join(OUTPUT_DIR, f"orig_{task_id}.wav")
+            )
             
         print(f"[VIDEO_DUBBING] Đang lưu file phụ đề...")
         vtt_filename = f"sub_{task_id}.vtt"
@@ -297,3 +311,230 @@ async def download_dubbed_video(task_id: str):
         except Exception as e:
             logger.error(f"Error remuxing video for task {task_id}: {e}", exc_info=True)
             raise HTTPException(status_code=500, detail=f"Lỗi tạo file tải xuống: {str(e)}")
+
+class RegenerateDubRequest(BaseModel):
+    task_id: str
+    voice: str
+    segments: List[Dict[str, Any]]
+
+@router.post("/api/video/regenerate-dub")
+async def regenerate_dub(request: RegenerateDubRequest):
+    task_id = request.task_id
+    voice = request.voice
+    segments = request.segments
+
+    if task_id not in tasks_store:
+        raise HTTPException(status_code=404, detail="Không tìm thấy task.")
+
+    orig_wav_path = os.path.join(OUTPUT_DIR, f"orig_{task_id}.wav")
+    if not os.path.exists(orig_wav_path):
+        raise HTTPException(status_code=400, detail="Không tìm thấy file âm thanh gốc của video này.")
+
+    # 1. Sinh thuyết minh mới & ghép
+    try:
+        # Đường dẫn xuất file audio thành phẩm mới
+        dubbed_filename = f"dubbed_{task_id}.mp3"
+        output_audio_path = os.path.join(OUTPUT_DIR, dubbed_filename)
+        
+        # Sinh giọng thuyết minh cho từng segment mới
+        with tempfile.TemporaryDirectory() as temp_dir:
+            tts_files = await translation_service.generate_all_tts(segments, voice, temp_dir)
+            
+            # Ghép âm thanh với pydub
+            from pydub import AudioSegment
+            original_audio = AudioSegment.from_file(orig_wav_path)
+            combined_audio = original_audio - 20 # Ducking nhạc nền gốc
+            
+            for idx, seg in enumerate(segments):
+                if idx not in tts_files:
+                    continue
+                start_ms = int(seg["start"] * 1000)
+                seg_audio = AudioSegment.from_file(tts_files[idx])
+                combined_audio = combined_audio.overlay(seg_audio, position=start_ms)
+                
+            combined_audio.export(output_audio_path, format="mp3")
+
+        # 2. Ghi lại phụ đề SRT & WebVTT mới
+        vtt_filename = f"sub_{task_id}.vtt"
+        srt_filename = f"sub_{task_id}.srt"
+        vtt_path = os.path.join(OUTPUT_DIR, vtt_filename)
+        srt_path = os.path.join(OUTPUT_DIR, srt_filename)
+        
+        vtt_lines = ["WEBVTT", ""]
+        srt_lines = []
+        
+        for idx, seg in enumerate(segments):
+            start = seg["start"]
+            end = seg["end"]
+            text = seg.get("translated_text", "")
+            
+            # Format SRT
+            srt_lines.append(str(idx + 1))
+            srt_lines.append(f"{format_time_srt(start)} --> {format_time_srt(end)}")
+            srt_lines.append(text)
+            srt_lines.append("")
+            
+            # Format WebVTT
+            vtt_lines.append(str(idx + 1))
+            vtt_lines.append(f"{format_time_vtt(start)} --> {format_time_vtt(end)}")
+            vtt_lines.append(text)
+            vtt_lines.append("")
+            
+        with open(vtt_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(vtt_lines))
+        with open(srt_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(srt_lines))
+
+        # 3. Cập nhật tasks_store (thêm tham số timestamp t để tránh cache trình duyệt trên FE)
+        timestamp = int(time.time())
+        tasks_store[task_id].update({
+            "audio_url": f"/static/video_translation/{dubbed_filename}?t={timestamp}",
+            "vtt_url": f"/static/video_translation/{vtt_filename}?t={timestamp}",
+            "srt_filename": srt_filename,
+            "audio_local_path": output_audio_path,
+            "segments": segments
+        })
+        
+        # Nếu có file video thành phẩm cũ (final_.mp4) thì xóa đi để khi download sẽ ghép (remux) mới hoàn toàn theo tiếng Việt vừa cập nhật
+        final_video_path = os.path.join(OUTPUT_DIR, f"final_{task_id}.mp4")
+        if os.path.exists(final_video_path):
+            try:
+                os.remove(final_video_path)
+            except Exception:
+                pass
+        
+        return {
+            "status": "success",
+            "audio_url": tasks_store[task_id]["audio_url"],
+            "vtt_url": tasks_store[task_id]["vtt_url"],
+            "srt_filename": srt_filename,
+            "segments": segments
+        }
+        
+    except Exception as e:
+        logger.error(f"Lỗi khi cập nhật giọng đọc: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Không thể cập nhật lồng tiếng: {str(e)}")
+
+@router.post("/api/video/whisper-test")
+async def whisper_test(
+    file: UploadFile = File(...)
+):
+    """Endpoint thử nghiệm nhận dạng giọng nói bằng mô hình Whisper thuần."""
+    # Kiểm tra phần mở rộng file
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in [".wav", ".mp3", ".m4a", ".webm", ".ogg", ".aac", ".flac"]:
+        raise HTTPException(status_code=400, detail="Định dạng âm thanh không hỗ trợ.")
+
+    # Lưu file tạm
+    temp_dir = tempfile.gettempdir()
+    temp_file_path = os.path.join(temp_dir, f"whisper_test_{uuid.uuid4().hex}{ext}")
+    
+    try:
+        with open(temp_file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        # Khởi tạo client Whisper
+        client, model, is_groq = translation_service._get_whisper_client()
+        
+        with open(temp_file_path, "rb") as audio_file:
+            transcription = client.audio.transcriptions.create(
+                file=audio_file,
+                model=model,
+                response_format="verbose_json"
+            )
+            
+        # Parse kết quả
+        data = transcription.model_dump() if hasattr(transcription, "model_dump") else transcription
+        segments = data.get("segments", [])
+        text = data.get("text", "")
+        language = data.get("language", "unknown")
+        
+        return {
+            "text": text,
+            "language": language,
+            "segments": [
+                {
+                    "id": seg.get("id"),
+                    "start": seg.get("start"),
+                    "end": seg.get("end"),
+                    "text": seg.get("text"),
+                    "no_speech_prob": seg.get("no_speech_prob", 0.0),
+                    "avg_logprob": seg.get("avg_logprob", 0.0),
+                    "compression_ratio": seg.get("compression_ratio", 0.0)
+                }
+                for seg in segments
+            ]
+        }
+    except Exception as e:
+        logger.error(f"Lỗi thử nghiệm Whisper STT: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Lỗi nhận dạng giọng nói: {str(e)}")
+    finally:
+        # Xóa file tạm
+        if os.path.exists(temp_file_path):
+            try:
+                os.remove(temp_file_path)
+            except Exception:
+                pass
+
+# ==========================================
+# ==========================================
+# TEXT-TO-SPEECH (TTS) DEMO & COMPARISON ENDPOINTS
+# ==========================================
+import sys
+import io
+import base64
+import soundfile as sf
+
+from kokoro_vietnamese import KokoroVietnamese
+
+# Khai báo biến toàn cục để cache các instance model cục bộ tránh khởi tạo lại nhiều lần
+kokoro_instances = {}
+
+def get_kokoro_instance(voice: str = "diem_trinh"):
+    global kokoro_instances
+    if voice not in kokoro_instances:
+        try:
+            kokoro_instances[voice] = KokoroVietnamese(voice=voice, device="cpu")
+        except Exception as e:
+            logger.error(f"Không thể khởi tạo KokoroVietnamese (voice={voice}): {e}", exc_info=True)
+            raise e
+    return kokoro_instances[voice]
+
+def generate_kokoro_tts(text: str, voice: Optional[str] = None) -> str:
+    v = voice or "diem_trinh"
+    from kokoro_vietnamese import VOICES
+    if v not in VOICES:
+        v = "diem_trinh"
+    kokoro = get_kokoro_instance(v)
+    audio, _ = kokoro.synthesize(text)
+    
+    buffer = io.BytesIO()
+    sf.write(buffer, audio, 24000, format='WAV')
+    buffer.seek(0)
+    return base64.b64encode(buffer.read()).decode("utf-8")
+
+class TTSRequest(BaseModel):
+    question: str
+    model: Optional[str] = "kokoro"
+    voice: Optional[str] = None
+
+@router.post("/ai-demos/audio")
+async def tts_demo(request: TTSRequest):
+    text = request.question
+    voice = request.voice or "diem_trinh"
+    
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Văn bản đầu vào không được để trống.")
+        
+    try:
+        audio_b64 = generate_kokoro_tts(text, voice)
+        return {"audio": audio_b64}
+    except Exception as e:
+        logger.error(f"Kokoro-Vietnamese failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Lỗi tạo TTS offline: {str(e)}")
+
+@router.post("/api/video/tts-test")
+async def tts_test_endpoint(request: TTSRequest):
+    """Endpoint thử nghiệm model offline."""
+    return await tts_demo(request)
+

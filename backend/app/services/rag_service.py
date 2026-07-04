@@ -98,20 +98,33 @@ class RAGService:
         if not text.strip():
             raise ValueError("Không thể trích xuất văn bản từ tài liệu này.")
 
-        # Cắt văn bản thành các đoạn nhỏ
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=800,
-            chunk_overlap=150
+        # Phân mảnh tài liệu theo cơ chế Phân cấp Cha-Con (Parent-Child)
+        # Đoạn cha (Parent): Chứa trọn vẹn ngữ cảnh của từng phần lớn
+        parent_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=2000,
+            chunk_overlap=250
         )
-        chunks = text_splitter.split_text(text)
+        parent_chunks = parent_splitter.split_text(text)
         
-        docs = [
-            LCDocument(
-                page_content=chunk,
-                metadata={"source": filename, "session_id": session_id}
-            )
-            for chunk in chunks
-        ]
+        child_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=400,
+            chunk_overlap=50
+        )
+        
+        docs = []
+        for p_chunk in parent_chunks:
+            c_chunks = child_splitter.split_text(p_chunk)
+            for c_chunk in c_chunks:
+                docs.append(
+                    LCDocument(
+                        page_content=c_chunk,
+                        metadata={
+                            "source": filename,
+                            "session_id": session_id,
+                            "parent_content": p_chunk
+                        }
+                    )
+                )
 
         # Khởi tạo hoặc cập nhật Chroma vectorstore lưu tạm thời trên RAM
         if session_id in self.stores:
@@ -121,7 +134,8 @@ class RAGService:
         else:
             vectorstore = Chroma.from_documents(
                 documents=docs,
-                embedding=self.embeddings
+                embedding=self.embeddings,
+                collection_name=session_id
             )
             self.stores[session_id] = vectorstore
             self.session_files[session_id] = [filename]
@@ -134,11 +148,27 @@ class RAGService:
             return None
             
         vectorstore = self.stores[session_id]
+        # Tìm các đoạn con có mức độ tương đồng cao nhất
         docs = vectorstore.similarity_search(query, k=k)
         
+        # Trích xuất các đoạn cha tương ứng để chuyển cho LLM
+        retrieved_parents = []
+        seen_parents = set()
+        for doc in docs:
+            parent = doc.metadata.get("parent_content")
+            if parent:
+                parent_strip = parent.strip()
+                if parent_strip not in seen_parents:
+                    seen_parents.add(parent_strip)
+                    retrieved_parents.append(parent)
+            else:
+                if doc.page_content.strip() not in seen_parents:
+                    seen_parents.add(doc.page_content.strip())
+                    retrieved_parents.append(doc.page_content)
+        
         formatted_context = "\n\n".join(
-            f"[Nguồn: {doc.metadata.get('source', 'Tài liệu')}]\n{doc.page_content}"
-            for doc in docs
+            f"[Nguồn: {docs[0].metadata.get('source', 'Tài liệu')}]\n{parent_text}"
+            for parent_text in retrieved_parents
         )
         return formatted_context
 

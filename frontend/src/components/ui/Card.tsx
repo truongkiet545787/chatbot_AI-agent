@@ -159,7 +159,7 @@ const Card = forwardRef<HTMLDivElement, ICardProps>((props, ref) => {
 	const { roundedCustom } = useRoundedSize(themeConfig.rounded);
 
 	const cardClasses = classNames(
-		'flex flex-col bg-white dark:bg-zinc-900',
+		'flex flex-col bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800/80',
 		{ [`${rounded as TRounded}`]: rounded !== 'auto' },
 		{ [`${roundedCustom(1)}`]: rounded === 'auto' },
 		className,

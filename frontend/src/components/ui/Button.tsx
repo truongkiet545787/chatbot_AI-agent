@@ -180,7 +180,7 @@ const Button = forwardRef<HTMLButtonElement, IButtonProps>((props, ref) => {
 	const btnDisabledClasses = 'opacity-50 pointer-events-none';
 
 	const classes = classNames(
-		'inline-flex items-center justify-center',
+		'inline-flex items-center justify-center active:scale-[0.97] active:translate-y-[0.5px]',
 		btnVariantClasses,
 		btnSizeClasses,
 		rounded,
